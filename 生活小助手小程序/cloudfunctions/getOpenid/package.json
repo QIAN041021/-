@@ -1,0 +1,9 @@
+{
+  "name": "getOpenid",
+  "version": "1.0.0",
+  "description": "返回调用者微信 openid，用于订阅消息定向推送",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}

@@ -1,0 +1,175 @@
+<view class="screen theme-{{themeClass}}" style="--app-font-scale:{{appFontScale}};--app-font-weight:{{appFontWeight}}" bindtouchstart="onEdgeTouchStart" bindtouchmove="onEdgeTouchMove">
+  <view class="drawer-hamburger" hover-class="drawer-hamburger-tap" hover-stay-time="80" bindtap="onHamburgerTap"><text user-select>≡</text></view>
+  <view class="content-wrapper">
+
+    <!-- 我的食材 -->
+    <view class="card">
+      <view class="card-header">
+        <view class="card-header-left"><text class="card-title" user-select>我的食材</text></view>
+        <view class="total-pill"><text class="total-pill-text" user-select>{{ingredientCount}}</text></view>
+      </view>
+      <view class="ingredients-grid">
+        <view class="ingredient-pill cat-{{item.cat}}" wx:for="{{ingredients}}" wx:key="name" wx:for-item="item">
+          <text user-select>{{item.name}}</text>
+          <view class="ingredient-pill-delete" data-name="{{item.name}}" bindtap="removeIngredient"><text user-select>×</text></view>
+        </view>
+      </view>
+      <view class="btn btn-pink" bindtap="openIngredientModal">
+        <text class="btn-text" user-select>添加食材</text>
+      </view>
+    </view>
+
+    <!-- 家常菜谱 -->
+    <view class="card">
+      <view class="card-header">
+        <view class="card-header-left"><text class="card-title" user-select>家常菜谱</text></view>
+        <view class="recipe-filter-row">
+          <view class="recipe-filter-pill {{recipeFilter === 'all' ? 'active' : 'inactive'}}" hover-class="pill-tap" hover-stay-time="80" data-mode="all" bindtap="toggleRecipeFilter"><text user-select>全部</text></view>
+          <view class="recipe-filter-pill {{recipeFilter === 'canMake' ? 'active' : 'inactive'}}" hover-class="pill-tap" hover-stay-time="80" data-mode="canMake" bindtap="toggleRecipeFilter"><text user-select>可做</text></view>
+        </view>
+      </view>
+
+      <view class="recipe-list">
+        <view class="recipe-item" wx:for="{{recipes}}" wx:key="name" wx:for-item="r" wx:if="{{recipeFilter === 'all' || r.canMake}}" hover-class="recipe-item-tap" hover-stay-time="80" data-index="{{index}}" bindtap="openRecipeDetail">
+          <view class="recipe-delete" data-index="{{index}}" catchtap="deleteRecipe"><text user-select>×</text></view>
+          <view class="recipe-thumb">
+            <image wx:if="{{r.image}}" src="{{r.image}}" mode="aspectFill" />
+            <image wx:else src="{{emptyThumb}}" mode="aspectFit" style="width:48rpx;height:48rpx;opacity:0.4" />
+          </view>
+          <view class="recipe-info">
+            <text class="recipe-name" user-select>{{r.name}}</text>
+            <view class="recipe-tags">
+              <text class="recipe-tag {{tag.cat}}" wx:for="{{r.tags}}" wx:key="*this" wx:for-item="tag" user-select>{{tag.name}}</text>
+              <text class="recipe-tag-more" wx:if="{{r.ingredients.length > 3}}" user-select>+{{r.ingredients.length - 3}}</text>
+            </view>
+          </view>
+          <text class="recipe-badge {{r.canMake ? 'can-make' : 'missing'}}" user-select>{{r.canMake ? '可做 ✓' : '缺' + r.missing + '种'}}</text>
+          <text class="recipe-arrow" user-select>›</text>
+        </view>
+      </view>
+
+      <view class="btn btn-green" bindtap="openRecipeModal">
+        <text class="btn-text" user-select>添加菜谱</text>
+      </view>
+    </view>
+
+  </view>
+</view>
+
+<!-- 食材弹窗 -->
+<view class="modal-overlay theme-{{themeClass}}" wx:if="{{showIngredientModal}}" bindtap="closeIngredientModal" style="--app-font-scale:{{appFontScale}};--app-font-weight:{{appFontWeight}}">
+  <view class="modal-sheet" catchtap="noop">
+    <view class="modal-handle"></view>
+    <view class="modal-title"><text user-select>添加食材</text></view>
+    <view class="modal-input-group">
+      <text class="modal-label" user-select>食材名称</text>
+      <input class="modal-input" placeholder="如：胡萝卜" value="{{ingName}}" bindinput="onIngredientName" />
+    </view>
+    <view class="modal-input-group">
+      <text class="modal-label" user-select>分类</text>
+      <view class="modal-cat-row">
+        <view class="modal-cat-pill {{ingCat === 'vegetable' ? 'selected' : ''}}" hover-class="pill-tap" hover-stay-time="80" data-cat="vegetable" bindtap="selectIngredientCat"><text user-select>蔬菜</text></view>
+        <view class="modal-cat-pill {{ingCat === 'meat' ? 'selected' : ''}}" hover-class="pill-tap" hover-stay-time="80" data-cat="meat" bindtap="selectIngredientCat"><text user-select>肉类</text></view>
+        <view class="modal-cat-pill {{ingCat === 'seasoning' ? 'selected' : ''}}" hover-class="pill-tap" hover-stay-time="80" data-cat="seasoning" bindtap="selectIngredientCat"><text user-select>调料</text></view>
+        <view class="modal-cat-pill {{ingCat === 'staple' ? 'selected' : ''}}" hover-class="pill-tap" hover-stay-time="80" data-cat="staple" bindtap="selectIngredientCat"><text user-select>主食</text></view>
+        <view class="modal-cat-pill {{ingCat === 'other' ? 'selected' : ''}}" hover-class="pill-tap" hover-stay-time="80" data-cat="other" bindtap="selectIngredientCat"><text user-select>其他</text></view>
+      </view>
+    </view>
+    <view class="modal-buttons">
+      <button class="modal-btn-cancel" bindtap="closeIngredientModal"><text user-select>取消</text></button>
+      <button class="modal-btn-confirm" bindtap="confirmAddIngredient"><text user-select>确认添加</text></button>
+    </view>
+  </view>
+</view>
+
+<!-- 菜谱弹窗 -->
+<view class="modal-overlay theme-{{themeClass}}" wx:if="{{showRecipeModal}}" bindtap="closeRecipeModal" style="--app-font-scale:{{appFontScale}};--app-font-weight:{{appFontWeight}}">
+  <view class="modal-sheet" catchtap="noop">
+    <view class="modal-handle"></view>
+    <view class="modal-title"><text user-select>添加菜谱</text></view>
+
+    <view class="modal-input-group">
+      <text class="modal-label" user-select>菜品图片</text>
+      <view class="recipe-upload-area" bindtap="chooseImage">
+        <image wx:if="{{recipeImage}}" src="{{recipeImage}}" mode="aspectFill" style="position:absolute;width:100%;height:100%;border-radius:32rpx;" />
+        <block wx:else>
+          <text class="recipe-upload-text" user-select>点击上传菜品图片</text>
+          <text class="recipe-upload-hint" user-select>选填，支持拍照或相册</text>
+        </block>
+      </view>
+    </view>
+
+    <view class="modal-input-group">
+      <text class="modal-label" user-select>菜名</text>
+      <input class="modal-input" placeholder="如：番茄牛腩" value="{{recipeName}}" bindinput="onRecipeName" />
+    </view>
+
+    <view class="modal-input-group">
+      <text class="modal-label" user-select>所需食材（输入后按逗号或回车添加）</text>
+      <view class="ingredient-tag-input-row">
+        <view class="ingredient-input-tag {{t.cat}}" wx:for="{{tempIngredients}}" wx:key="name" wx:for-item="t">
+          <text user-select>{{t.name}}</text>
+          <text class="ingredient-input-tag-delete" data-name="{{t.name}}" bindtap="removeTempIngredient" user-select>×</text>
+        </view>
+        <input placeholder="如：西红柿" value="{{recipeIngredientInput}}" bindinput="onRecipeIngredientInput" bindconfirm="addTempIngredientFromInput" />
+      </view>
+      <view style="margin-top:16rpx;">
+        <button class="modal-btn-cancel" style="display:inline-block;width:auto;padding:16rpx 32rpx;" bindtap="addTempIngredientFromInput"><text user-select>添加食材</text></button>
+      </view>
+    </view>
+
+    <view class="modal-input-group">
+      <text class="modal-label" user-select>做法步骤（选填）</text>
+      <textarea class="modal-textarea" placeholder="1. 番茄切块，牛腩焯水..." value="{{recipeSteps}}" bindinput="onRecipeSteps" />
+    </view>
+
+    <view class="modal-buttons">
+      <button class="modal-btn-cancel" bindtap="closeRecipeModal"><text user-select>取消</text></button>
+      <button class="modal-btn-confirm" bindtap="confirmAddRecipe"><text user-select>确认添加</text></button>
+    </view>
+  </view>
+</view>
+
+<!-- 菜谱详情弹窗 -->
+<view class="modal-overlay theme-{{themeClass}}" wx:if="{{recipeDetail}}" bindtap="closeRecipeDetail" style="--app-font-scale:{{appFontScale}};--app-font-weight:{{appFontWeight}}">
+  <view class="modal-sheet" catchtap="noop">
+    <view class="modal-handle"></view>
+    <view class="modal-title"><text user-select>{{recipeDetail.name}}</text></view>
+
+    <scroll-view scroll-y class="recipe-detail-body">
+      <view class="recipe-detail-hero" wx:if="{{recipeDetail.image}}">
+        <image src="{{recipeDetail.image}}" mode="aspectFill" />
+      </view>
+      <view class="recipe-detail-hero empty" wx:else>
+        <image src="{{emptyThumb}}" mode="aspectFit" style="width:64rpx;height:64rpx;opacity:0.4" />
+      </view>
+
+      <view class="recipe-detail-section">
+        <text class="recipe-detail-label" user-select>所需食材</text>
+        <view class="recipe-detail-ingredients">
+          <view class="ingredient-pill cat-{{item.cat}}" wx:for="{{recipeDetail.ingredients}}" wx:key="name" wx:for-item="item">
+            <text user-select>{{item.name}}</text>
+          </view>
+          <text wx:if="{{!recipeDetail.ingredients.length}}" class="recipe-detail-empty" user-select>未记录食材</text>
+        </view>
+      </view>
+
+      <view class="recipe-detail-section">
+        <text class="recipe-detail-label" user-select>做法步骤</text>
+        <view class="recipe-detail-steps" wx:if="{{recipeDetail.stepList.length}}">
+          <view class="recipe-step" wx:for="{{recipeDetail.stepList}}" wx:key="*this" wx:for-item="step" wx:for-index="si">
+            <text class="recipe-step-num" user-select>{{si + 1}}</text>
+            <text class="recipe-step-text" user-select>{{step}}</text>
+          </view>
+        </view>
+        <text wx:else class="recipe-detail-empty" user-select>暂无做法步骤</text>
+      </view>
+    </scroll-view>
+
+    <view class="modal-buttons">
+      <button class="modal-btn-cancel" bindtap="closeRecipeDetail"><text user-select>关闭</text></button>
+    </view>
+  </view>
+</view>
+
+<drawer id="drawer" show="{{drawerShow}}" pages="{{drawerPages}}" bind:close="onDrawerClose" bind:navigate="onDrawerNavigate" />

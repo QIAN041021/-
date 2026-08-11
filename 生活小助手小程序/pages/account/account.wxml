@@ -1,0 +1,129 @@
+<view class="screen theme-{{themeClass}}" style="--app-font-scale:{{appFontScale}};--app-font-weight:{{appFontWeight}}" bindtouchstart="onEdgeTouchStart" bindtouchmove="onEdgeTouchMove">
+  <view class="drawer-hamburger" hover-class="drawer-hamburger-tap" hover-stay-time="80" bindtap="onHamburgerTap"><text user-select>≡</text></view>
+  <view class="content-wrapper">
+    <view class="balance-card" bindtap="editBalance">
+      <view class="balance-left">
+        <view class="balance-label-row"><text class="balance-label" user-select>账户总余额 · 点击修改期初余额</text></view>
+        <text class="balance-value" user-select>{{balance}}</text>
+        <view class="account-balance-row">
+          <text class="account-balance-tag" user-select>个人 {{personalBalance}}</text>
+          <text class="account-balance-tag" user-select>家庭 {{familyBalance}}</text>
+        </view>
+      </view>
+      <view class="balance-right"><image src="{{editIcon}}" mode="aspectFit" style="width:40rpx;height:40rpx;" /></view>
+    </view>
+
+    <view class="stats-row">
+      <view class="stat-card"><text class="stat-label" user-select>今日支出</text><text class="stat-value amount-expense" user-select>{{statTodayExpense}}</text></view>
+      <view class="stat-card"><text class="stat-label" user-select>本月支出</text><text class="stat-value amount-expense" user-select>{{statMonthExpense}}</text></view>
+      <view class="stat-card"><text class="stat-label" user-select>本月收入</text><text class="stat-value amount-income" user-select>{{statMonthIncome}}</text></view>
+    </view>
+
+    <view class="card">
+      <view class="card-header">
+        <view class="card-header-left"><text class="card-title" user-select>每日记账</text></view>
+        <picker mode="date" value="{{expenseDate}}" bindchange="onExpenseDateChange"><view class="date-pill"><text class="date-pill-text" user-select>{{expenseDateLabel}}</text></view></picker>
+      </view>
+      <view class="filter-row">
+        <view class="filter-pill {{expenseScope === 'all' ? 'active' : 'inactive'}}" hover-class="pill-tap" hover-stay-time="80" data-scope="all" bindtap="selectExpenseScope"><text user-select>全部</text></view>
+        <view class="filter-pill {{expenseScope === 'family' ? 'active' : 'inactive'}}" hover-class="pill-tap" hover-stay-time="80" data-scope="family" bindtap="selectExpenseScope"><text user-select>家庭</text></view>
+        <view class="filter-pill {{expenseScope === 'personal' ? 'active' : 'inactive'}}" hover-class="pill-tap" hover-stay-time="80" data-scope="personal" bindtap="selectExpenseScope"><text user-select>个人</text></view>
+      </view>
+      <view class="expense-list">
+        <view wx:if="{{!expenseList.length}}" class="empty-tip"><text user-select>这一天还没有记账哦</text></view>
+        <view class="expense-item" wx:for="{{expenseList}}" wx:key="idx" wx:for-item="e">
+          <view class="expense-item-left">
+            <view class="cat-dot" style="background:{{e.color}}"></view>
+            <view class="record-labels"><text class="expense-text" user-select>{{e.cat}}{{e.name ? ' · ' + e.name : ''}}</text><text class="record-type-tag {{e.typeClass}}" user-select>{{e.typeText}}</text></view>
+            <text class="scope-tag {{e.scope === 'family' ? 'scope-family' : 'scope-personal'}}" user-select>{{e.scope === 'family' ? '家庭' : '个人'}}</text>
+          </view>
+          <view class="record-actions"><text class="expense-amount {{e.typeClass}}" user-select>{{e.amountText}}</text><view class="check-item-delete" data-index="{{e.idx}}" bindtap="deleteExpense"><text user-select>×</text></view></view>
+        </view>
+      </view>
+      <view class="account-action-row">
+        <view class="btn btn-expense" bindtap="openAddModal" data-type="expense" data-record-type="expense"><text class="btn-text" user-select>记支出</text></view>
+        <view class="btn btn-income" bindtap="openAddModal" data-type="income" data-record-type="income"><text class="btn-text" user-select>记收入</text></view>
+      </view>
+    </view>
+
+    <view class="card">
+      <view class="card-header"><view class="card-header-left"><text class="card-title" user-select>刚需必买</text></view><view class="total-pill"><text class="total-pill-text" user-select>{{necessityTotal}}</text></view></view>
+      <view class="check-list">
+        <view class="check-item" wx:for="{{necessityList}}" wx:key="id" wx:for-item="n">
+          <view class="checkbox {{n.checked ? 'checked' : ''}}" data-type="necessity" data-id="{{n.id}}" bindtap="toggleCheck"><image wx:if="{{n.checked}}" src="{{checkIcon}}" mode="aspectFit" style="width:24rpx;height:24rpx;" /></view>
+          <text class="check-item-name" style="{{n.checked ? 'text-decoration:line-through;color:#C88E8E;' : ''}}" user-select>{{n.name}}</text>
+          <text class="scope-tag scope-family" user-select>家庭</text><text class="check-item-price" user-select>{{n.amountText}}</text><view class="check-item-delete" data-id="{{n.id}}" bindtap="deleteNecessity"><text user-select>×</text></view>
+        </view>
+      </view>
+      <view class="btn btn-pink" bindtap="openAddModal" data-type="necessity"><text class="btn-text" user-select>添加刚需</text></view>
+    </view>
+
+    <view class="card">
+      <view class="card-header"><view class="card-header-left"><text class="card-title" user-select>愿望清单</text></view><view class="total-pill"><text class="total-pill-text" user-select>{{wishTotal}}</text></view></view>
+      <view class="filter-row">
+        <view class="filter-pill {{wishScope === 'all' ? 'active' : 'inactive'}}" hover-class="pill-tap" hover-stay-time="80" data-scope="all" bindtap="selectWishScope"><text user-select>全部</text></view>
+        <view class="filter-pill {{wishScope === 'personal' ? 'active' : 'inactive'}}" hover-class="pill-tap" hover-stay-time="80" data-scope="personal" bindtap="selectWishScope"><text user-select>个人</text></view>
+        <view class="filter-pill {{wishScope === 'family' ? 'active' : 'inactive'}}" hover-class="pill-tap" hover-stay-time="80" data-scope="family" bindtap="selectWishScope"><text user-select>家庭</text></view>
+      </view>
+      <view class="check-list">
+        <view class="check-item" wx:for="{{wishList}}" wx:key="id" wx:for-item="w">
+          <view class="checkbox {{w.checked ? 'checked' : ''}}" data-type="wish" data-id="{{w.id}}" bindtap="toggleCheck"><image wx:if="{{w.checked}}" src="{{checkIcon}}" mode="aspectFit" style="width:24rpx;height:24rpx;" /></view>
+          <text class="check-item-name" style="{{w.checked ? 'text-decoration:line-through;color:#C88E8E;' : ''}}" user-select>{{w.name}}</text>
+          <text class="scope-tag {{w.ownerClass}}" user-select>{{w.ownerText}}</text><text class="check-item-price" user-select>{{w.amountText}}</text><view class="check-item-delete" data-id="{{w.id}}" bindtap="deleteWish"><text user-select>×</text></view>
+        </view>
+      </view>
+      <view class="btn btn-pink" bindtap="openAddModal" data-type="wish"><text class="btn-text" user-select>添加愿望</text></view>
+    </view>
+
+    <view class="card">
+      <view class="card-header"><view class="card-header-left"><text class="card-title" user-select>收支统计</text></view></view>
+      <view class="filter-row">
+        <view class="filter-pill {{chartType === 'expense' ? 'active' : 'inactive'}}" hover-class="pill-tap" hover-stay-time="80" data-type="expense" bindtap="selectChartType"><text user-select>支出</text></view>
+        <view class="filter-pill {{chartType === 'income' ? 'active' : 'inactive'}}" hover-class="pill-tap" hover-stay-time="80" data-type="income" bindtap="selectChartType"><text user-select>收入</text></view>
+      </view>
+      <view class="filter-row filter-scroll-row">
+        <view class="filter-pill {{chartPeriod === 'today' ? 'active' : 'inactive'}}" hover-class="pill-tap" hover-stay-time="80" data-period="today" bindtap="selectChartPeriod"><text user-select>今天</text></view>
+        <view class="filter-pill {{chartPeriod === 'week' ? 'active' : 'inactive'}}" hover-class="pill-tap" hover-stay-time="80" data-period="week" bindtap="selectChartPeriod"><text user-select>本周</text></view>
+        <view class="filter-pill {{chartPeriod === 'month' ? 'active' : 'inactive'}}" hover-class="pill-tap" hover-stay-time="80" data-period="month" bindtap="selectChartPeriod"><text user-select>本月</text></view>
+        <view class="filter-pill {{chartPeriod === 'halfyear' ? 'active' : 'inactive'}}" hover-class="pill-tap" hover-stay-time="80" data-period="halfyear" bindtap="selectChartPeriod"><text user-select>近半年</text></view>
+      </view>
+      <view class="date-range-row">
+        <picker mode="date" value="{{chartStart}}" bindchange="onChartStartChange"><view class="date-pill"><text class="date-pill-text" user-select>{{chartStart}}</text></view></picker>
+        <text class="date-range-divider" user-select>至</text>
+        <picker mode="date" value="{{chartEnd}}" bindchange="onChartEndChange"><view class="date-pill"><text class="date-pill-text" user-select>{{chartEnd}}</text></view></picker>
+      </view>
+      <view class="filter-row">
+        <view class="filter-pill {{chartScope === 'all' ? 'active' : 'inactive'}}" hover-class="pill-tap" hover-stay-time="80" data-scope="all" bindtap="selectChartScope"><text user-select>全部</text></view>
+        <view class="filter-pill {{chartScope === 'family' ? 'active' : 'inactive'}}" hover-class="pill-tap" hover-stay-time="80" data-scope="family" bindtap="selectChartScope"><text user-select>家庭</text></view>
+        <view class="filter-pill {{chartScope === 'personal' ? 'active' : 'inactive'}}" hover-class="pill-tap" hover-stay-time="80" data-scope="personal" bindtap="selectChartScope"><text user-select>个人</text></view>
+      </view>
+      <view class="chart-area"><canvas type="2d" id="doughnut" class="doughnut-canvas"></canvas><view class="legend-column"><view class="legend-item" wx:for="{{chartLegend}}" wx:key="name" wx:for-item="l"><view class="legend-dot" style="background:{{l.color}}"></view><text class="legend-text" user-select>{{l.name}}</text><text class="legend-amount {{l.amount <= 0 ? 'zero' : ''}}" user-select>{{l.amountText}}</text></view></view></view>
+    </view>
+  </view>
+</view>
+
+<view class="modal-overlay theme-{{themeClass}}" wx:if="{{modalType}}" bindtap="closeModal" style="--app-font-scale:{{appFontScale}};--app-font-weight:{{appFontWeight}}">
+  <view class="modal-sheet" catchtap="noop">
+    <view class="modal-handle"></view><view class="modal-title"><text user-select>{{modalTitle}}</text></view>
+    <view class="modal-input-group"><text class="modal-label" user-select>{{modalType === 'income' ? '名称（选填）' : '名称'}}</text><input class="modal-input" placeholder="{{modalType === 'income' ? '可不填' : '如：午餐'}}" value="{{modalName}}" bindinput="onModalName" /></view>
+    <block wx:if="{{modalType === 'expense' || modalType === 'income'}}">
+      <view class="modal-input-group"><text class="modal-label" user-select>分类</text><view class="modal-cat-row"><view class="modal-cat-pill {{modalCat === c ? 'selected' : ''}}" hover-class="pill-tap" hover-stay-time="80" wx:for="{{cats}}" wx:key="*this" wx:for-item="c" data-cat="{{c}}" bindtap="selectCat"><text user-select>{{c}}</text></view></view></view>
+      <view class="modal-input-group"><text class="modal-label" user-select>归属账户</text><view class="modal-cat-row"><view class="modal-cat-pill {{modalScope === 'personal' ? 'selected' : ''}}" hover-class="pill-tap" hover-stay-time="80" data-scope="personal" bindtap="selectScope"><text user-select>个人</text></view><view class="modal-cat-pill {{modalScope === 'family' ? 'selected' : ''}}" hover-class="pill-tap" hover-stay-time="80" data-scope="family" bindtap="selectScope"><text user-select>家庭</text></view></view></view>
+      <view class="modal-input-group"><text class="modal-label" user-select>日期</text><picker mode="date" value="{{modalDate}}" bindchange="onModalDate"><view class="modal-input"><text user-select>{{modalDate}}</text></view></picker></view>
+    </block>
+    <block wx:if="{{modalType === 'wish'}}"><view class="modal-input-group"><text class="modal-label" user-select>归属账户</text><view class="modal-cat-row"><view class="modal-cat-pill {{modalScope === 'personal' ? 'selected' : ''}}" hover-class="pill-tap" hover-stay-time="80" data-scope="personal" bindtap="selectScope"><text user-select>个人</text></view><view class="modal-cat-pill {{modalScope === 'family' ? 'selected' : ''}}" hover-class="pill-tap" hover-stay-time="80" data-scope="family" bindtap="selectScope"><text user-select>家庭</text></view></view></view></block>
+    <view class="modal-input-group"><text class="modal-label" user-select>金额</text><input class="modal-input" type="digit" placeholder="¥0.00" value="{{modalAmount}}" bindinput="onModalAmount" /></view>
+    <view class="modal-buttons"><button class="modal-btn-cancel" bindtap="closeModal"><text user-select>取消</text></button><button class="modal-btn-confirm" bindtap="confirmAdd"><text user-select>确认</text></button></view>
+  </view>
+</view>
+
+<view class="modal-overlay theme-{{themeClass}}" wx:if="{{showBalanceModal}}" bindtap="closeBalance" style="--app-font-scale:{{appFontScale}};--app-font-weight:{{appFontWeight}}">
+  <view class="modal-sheet" catchtap="noop">
+    <view class="modal-handle"></view><view class="modal-title"><text user-select>修改账户期初余额</text></view>
+    <view class="modal-input-group"><text class="modal-label" user-select>账户</text><view class="modal-cat-row"><view class="modal-cat-pill {{balanceAccount === 'personal' ? 'selected' : ''}}" hover-class="pill-tap" hover-stay-time="80" data-account="personal" bindtap="selectBalanceAccount"><text user-select>个人</text></view><view class="modal-cat-pill {{balanceAccount === 'family' ? 'selected' : ''}}" hover-class="pill-tap" hover-stay-time="80" data-account="family" bindtap="selectBalanceAccount"><text user-select>家庭</text></view></view></view>
+    <view class="modal-input-group"><text class="modal-label" user-select>期初余额（元）</text><input class="modal-input" type="digit" value="{{balanceInput}}" bindinput="onBalanceInput" /></view>
+    <view class="modal-buttons"><button class="modal-btn-cancel" bindtap="closeBalance"><text user-select>取消</text></button><button class="modal-btn-confirm" bindtap="confirmBalance"><text user-select>保存</text></button></view>
+  </view>
+</view>
+
+<drawer id="drawer" show="{{drawerShow}}" pages="{{drawerPages}}" bind:close="onDrawerClose" bind:navigate="onDrawerNavigate" />

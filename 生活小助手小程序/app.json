@@ -1,0 +1,33 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/login/login",
+    "pages/account/account",
+    "pages/recipe/recipe",
+    "pages/supply/supply",
+    "pages/pickup/pickup",
+    "pages/settings/settings",
+    "pages/medication/medication"
+  ],
+  "window": {
+    "backgroundColor": "#FDF8F4",
+    "backgroundTextStyle": "dark",
+    "navigationBarBackgroundColor": "#FDF8F4",
+    "navigationBarTitleText": "生活小助手",
+    "navigationBarTextStyle": "black"
+  },
+  "tabBar": {
+    "custom": true,
+    "color": "#C88E8E",
+    "selectedColor": "#F4B8B8",
+    "list": [
+      { "pagePath": "pages/index/index", "text": "首页" },
+      { "pagePath": "pages/account/account", "text": "记账" },
+      { "pagePath": "pages/recipe/recipe", "text": "菜谱" },
+      { "pagePath": "pages/supply/supply", "text": "进度条" },
+      { "pagePath": "pages/pickup/pickup", "text": "取件码" }
+    ]
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json"
+}

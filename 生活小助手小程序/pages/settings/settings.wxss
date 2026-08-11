@@ -1,0 +1,71 @@
+/* settings 页面级样式（主要样式在 app.wxss） */
+.settings-feedback-input {
+  min-height: 200rpx;
+}
+
+/* ===== 字体设置面板 ===== */
+.font-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 32rpx;
+}
+.font-row-gap {
+  margin-top: 44rpx;
+  padding-top: 36rpx;
+  border-top: 2rpx solid var(--theme-border);
+}
+.font-label {
+  font-size: calc(28rpx * var(--app-font-scale, 1));
+  font-weight: 600;
+  color: var(--theme-text);
+}
+.font-value {
+  font-size: calc(26rpx * var(--app-font-scale, 1));
+  font-weight: 600;
+  color: var(--theme-primary);
+}
+.font-slider {
+  margin: 12rpx 8rpx 0;
+}
+.font-scale-ticks {
+  display: flex;
+  justify-content: space-between;
+  padding: 0 6rpx;
+  margin-top: 4rpx;
+}
+.font-scale-tick {
+  font-size: calc(22rpx * var(--app-font-scale, 1));
+  color: var(--theme-text-secondary);
+}
+.font-weight-row {
+  display: flex;
+  gap: 20rpx;
+  margin-top: 16rpx;
+}
+.font-weight-pill {
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 22rpx 0;
+  border-radius: 32rpx;
+  background: var(--theme-card-bg);
+  border: 3rpx solid var(--theme-text-secondary);
+  color: var(--theme-text-secondary);
+  box-shadow: inset 0 0 0 2rpx rgba(255, 255, 255, 0.7), 0 2rpx 6rpx var(--theme-shadow-xs);
+  transition: all 0.12s ease;
+}
+.font-weight-pill.selected {
+  color: #333333;
+  background: #FFFFFF;
+  border: 4rpx solid var(--theme-primary);
+  font-weight: 700;
+  box-shadow: 0 4rpx 14rpx rgba(0, 0, 0, 0.12);
+}
+.font-weight-pill.pill-tap { transform: scale(0.96); }
+.font-weight-pill.selected.pill-tap { box-shadow: inset 0 4rpx 8rpx rgba(0, 0, 0, 0.1), 0 4rpx 8rpx rgba(0, 0, 0, 0.12); }
+.font-weight-sample {
+  font-size: calc(30rpx * var(--app-font-scale, 1));
+}

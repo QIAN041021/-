@@ -1,0 +1,172 @@
+<view class="screen theme-{{themeClass}}" style="--app-font-scale:{{appFontScale}};--app-font-weight:{{appFontWeight}}" bindtouchstart="onEdgeTouchStart" bindtouchmove="onEdgeTouchMove">
+
+  <view class="drawer-hamburger" hover-class="drawer-hamburger-tap" hover-stay-time="80" bindtap="onHamburgerTap"><text user-select>≡</text></view>
+
+  <view class="content-wrapper">
+
+    <!-- 板块一：人物档案 -->
+    <view class="card">
+      <view class="card-header">
+        <view class="card-header-left"><text class="card-title" user-select>人物档案</text></view>
+        <view class="med-add-btn" hover-class="med-add-btn-tap" hover-stay-time="80" bindtap="openProfileModal"><text user-select>＋ 新建</text></view>
+      </view>
+
+      <view class="profile-card" wx:if="{{currentProfile}}">
+        <view class="profile-switch">
+          <picker mode="selector" range="{{profileNames}}" value="{{currentProfileIndex}}" bindchange="switchProfile">
+            <view class="profile-switch-btn" hover-class="med-pill-tap" hover-stay-time="80">
+              <text user-select>{{currentProfile.name || '未命名'}}</text>
+              <text class="caret" user-select> ▾</text>
+            </view>
+          </picker>
+          <view class="profile-actions">
+            <view class="med-edit-btn" hover-class="med-pill-tap" hover-stay-time="80" bindtap="editProfile"><text user-select>编辑</text></view>
+            <view class="med-del-btn" hover-class="med-pill-tap" hover-stay-time="80" bindtap="deleteProfile"><text user-select>删除</text></view>
+          </view>
+        </view>
+        <view class="profile-field"><text class="pf-label" user-select>性别</text><text class="pf-value" user-select>{{currentProfile.gender || '-'}}</text></view>
+        <view class="profile-field"><text class="pf-label" user-select>年龄</text><text class="pf-value" user-select>{{currentProfile.age || '-'}}</text></view>
+        <view class="profile-field"><text class="pf-label" user-select>出生</text><text class="pf-value" user-select>{{currentProfile.birthday || '-'}}</text></view>
+        <view class="profile-field"><text class="pf-label" user-select>过敏史</text><text class="pf-value" user-select>{{currentProfile.allergy || '-'}}</text></view>
+        <view class="profile-field"><text class="pf-label" user-select>过往病史</text><text class="pf-value" user-select>{{currentProfile.history || '-'}}</text></view>
+      </view>
+
+      <view class="empty-tip" wx:else>
+        <text user-select>还没有人物档案，点击"新建"添加</text>
+      </view>
+    </view>
+
+    <!-- 板块二：家用药物记录 -->
+    <view class="card">
+      <view class="card-header">
+        <view class="card-header-left"><text class="card-title" user-select>家用药物记录</text></view>
+        <view class="med-add-btn" hover-class="med-add-btn-tap" hover-stay-time="80" bindtap="openMedicineModal"><text user-select>＋ 新建</text></view>
+      </view>
+
+      <view class="med-list" wx:if="{{medicines.length}}">
+        <view class="med-card" wx:for="{{medicines}}" wx:key="id" data-id="{{item.id}}">
+          <image class="med-thumb" src="{{item.image}}" mode="aspectFill" wx:if="{{item.image}}" />
+          <view class="med-thumb med-thumb-empty" wx:else><text user-select>无图</text></view>
+          <view class="med-info">
+            <text class="med-name" user-select>{{item.name || '未命名药物'}}</text>
+            <text class="med-sub" user-select wx:if="{{item.func || item.usage}}">{{item.func || ''}}{{item.func && item.usage ? ' · ' : ''}}{{item.usage || ''}}</text>
+            <text class="med-sub" user-select>分类：{{item.category || '-'}}</text>
+            <text class="med-sub" user-select>购入：{{item.buyDate || '-'}} {{item.buyNote ? '（' + item.buyNote + '）' : ''}}</text>
+            <text class="med-expiry" user-select>到期：{{item.expiryDate || '-'}}</text>
+            <text class="med-sub" user-select wx:if="{{item.remain}}">剩余：{{item.remain}}</text>
+          </view>
+          <view class="med-actions">
+            <view class="med-edit-btn" hover-class="med-pill-tap" hover-stay-time="80" data-id="{{item.id}}" bindtap="editMedicine"><text user-select>编辑</text></view>
+            <view class="med-del-btn" hover-class="med-pill-tap" hover-stay-time="80" data-id="{{item.id}}" bindtap="deleteMedicine"><text user-select>删除</text></view>
+          </view>
+        </view>
+      </view>
+
+      <view class="empty-tip" wx:else>
+        <text user-select>还没有药物记录，点击"新建"添加</text>
+      </view>
+    </view>
+
+  </view>
+
+  <!-- 人物弹窗 -->
+  <view class="modal-overlay theme-{{themeClass}}" wx:if="{{profileModalVisible}}" bindtap="closeProfileModal" style="--app-font-scale:{{appFontScale}};--app-font-weight:{{appFontWeight}}">
+    <view class="modal-sheet" catchtap="noop">
+      <view class="modal-handle"></view>
+      <view class="modal-title"><text user-select>{{editingProfileId ? '编辑人物' : '新建人物'}}</text></view>
+      <view class="modal-input-group">
+        <text class="modal-label" user-select>姓名</text>
+        <input class="modal-input" placeholder="如：张三" value="{{profileForm.name}}" data-field="name" bindinput="onProfileField" confirm-type="done" />
+      </view>
+      <view class="modal-input-group">
+        <text class="modal-label" user-select>性别</text>
+        <view class="modal-cat-row">
+          <view class="modal-cat-pill {{profileForm.gender === item ? 'selected' : ''}}" hover-class="pill-tap" hover-stay-time="80" wx:for="{{genderOptions}}" wx:key="*this" data-g="{{item}}" bindtap="selectProfileGender"><text user-select>{{item}}</text></view>
+        </view>
+      </view>
+      <view class="modal-input-group">
+        <text class="modal-label" user-select>年龄</text>
+        <input class="modal-input" type="number" placeholder="如：32" value="{{profileForm.age}}" data-field="age" bindinput="onProfileField" confirm-type="done" />
+      </view>
+      <view class="modal-input-group">
+        <text class="modal-label" user-select>出生年月日</text>
+        <picker mode="date" value="{{profileForm.birthday}}" bindchange="onProfileBirthday">
+          <view class="modal-input modal-input-picker"><text user-select>{{profileForm.birthday || '选择日期'}}</text></view>
+        </picker>
+      </view>
+      <view class="modal-input-group">
+        <text class="modal-label" user-select>药物过敏史</text>
+        <input class="modal-input" placeholder="如：青霉素" value="{{profileForm.allergy}}" data-field="allergy" bindinput="onProfileField" confirm-type="done" />
+      </view>
+      <view class="modal-input-group">
+        <text class="modal-label" user-select>过往病史</text>
+        <textarea class="modal-textarea" placeholder="如：高血压、糖尿病" value="{{profileForm.history}}" data-field="history" bindinput="onProfileField" />
+      </view>
+      <view class="modal-buttons">
+        <button class="modal-btn-cancel" bindtap="closeProfileModal"><text user-select>取消</text></button>
+        <button class="modal-btn-confirm" bindtap="saveProfile"><text user-select>保存</text></button>
+      </view>
+    </view>
+  </view>
+
+  <!-- 药物弹窗 -->
+  <view class="modal-overlay theme-{{themeClass}}" wx:if="{{medicineModalVisible}}" bindtap="closeMedicineModal" style="--app-font-scale:{{appFontScale}};--app-font-weight:{{appFontWeight}}">
+    <view class="modal-sheet" catchtap="noop">
+      <view class="modal-handle"></view>
+      <view class="modal-title"><text user-select>{{editingMedicineId ? '编辑药物' : '新建药物'}}</text></view>
+      <view class="modal-input-group">
+        <text class="modal-label" user-select>药物图片</text>
+        <view class="med-upload" bindtap="chooseImage" hover-class="med-pill-tap" hover-stay-time="80">
+          <image wx:if="{{medicineForm.image}}" src="{{medicineForm.image}}" mode="aspectFill" class="med-upload-img" />
+          <view wx:else class="med-upload-empty"><text user-select>＋ 上传图片</text></view>
+          <view wx:if="{{medicineForm.image}}" class="med-upload-del" catchtap="removeMedicineImage"><text user-select>×</text></view>
+        </view>
+      </view>
+      <view class="modal-input-group">
+        <text class="modal-label" user-select>名称</text>
+        <input class="modal-input" placeholder="如：布洛芬" value="{{medicineForm.name}}" data-field="name" bindinput="onMedicineField" confirm-type="done" />
+      </view>
+      <view class="modal-input-group">
+        <text class="modal-label" user-select>功能</text>
+        <input class="modal-input" placeholder="如：退烧镇痛" value="{{medicineForm.func}}" data-field="func" bindinput="onMedicineField" confirm-type="done" />
+      </view>
+      <view class="modal-input-group">
+        <text class="modal-label" user-select>用途</text>
+        <input class="modal-input" placeholder="如：发热时口服" value="{{medicineForm.usage}}" data-field="usage" bindinput="onMedicineField" confirm-type="done" />
+      </view>
+      <view class="modal-input-group">
+        <text class="modal-label" user-select>分类</text>
+        <view class="modal-cat-row">
+          <view class="modal-cat-pill {{medicineForm.category === item ? 'selected' : ''}}" hover-class="pill-tap" hover-stay-time="80" wx:for="{{categoryOptions}}" wx:key="*this" data-c="{{item}}" bindtap="selectMedicineCategory"><text user-select>{{item}}</text></view>
+        </view>
+      </view>
+      <view class="modal-input-group">
+        <text class="modal-label" user-select>购买日期</text>
+        <picker mode="date" value="{{medicineForm.buyDate}}" bindchange="onMedicineBuyDate">
+          <view class="modal-input modal-input-picker"><text user-select>{{medicineForm.buyDate || '选择日期'}}</text></view>
+        </picker>
+      </view>
+      <view class="modal-input-group">
+        <text class="modal-label" user-select>购买备注</text>
+        <input class="modal-input" placeholder="如：超市促销" value="{{medicineForm.buyNote}}" data-field="buyNote" bindinput="onMedicineField" confirm-type="done" />
+      </view>
+      <view class="modal-input-group">
+        <text class="modal-label" user-select>保质期到期</text>
+        <picker mode="date" value="{{medicineForm.expiryDate}}" bindchange="onMedicineExpiry">
+          <view class="modal-input modal-input-picker"><text user-select>{{medicineForm.expiryDate || '选择日期'}}</text></view>
+        </picker>
+      </view>
+      <view class="modal-input-group">
+        <text class="modal-label" user-select>剩余数量</text>
+        <input class="modal-input" placeholder="如：还剩 2 盒" value="{{medicineForm.remain}}" data-field="remain" bindinput="onMedicineField" confirm-type="done" />
+      </view>
+      <view class="modal-buttons">
+        <button class="modal-btn-cancel" bindtap="closeMedicineModal"><text user-select>取消</text></button>
+        <button class="modal-btn-confirm" bindtap="saveMedicine"><text user-select>保存</text></button>
+      </view>
+    </view>
+  </view>
+
+  <drawer id="drawer" show="{{drawerShow}}" pages="{{drawerPages}}" bind:close="onDrawerClose" bind:navigate="onDrawerNavigate" />
+
+</view>

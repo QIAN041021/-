@@ -1,0 +1,9 @@
+{
+  "name": "taskReminder",
+  "version": "1.0.0",
+  "description": "定时扫描任务，下发到期提醒订阅消息",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "设置",
+  "navigationBarBackgroundColor": "#FDF8F4",
+  "navigationBarTextStyle": "black",
+  "usingComponents": { "drawer": "/components/drawer/index" }
+}

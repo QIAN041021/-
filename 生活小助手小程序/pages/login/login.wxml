@@ -1,0 +1,38 @@
+<view class="login-screen theme-{{themeClass}}">
+  <view class="brand">
+    <image class="brand-logo" src="{{brandIcon}}" mode="aspectFit" />
+    <text class="brand-title" user-select>生活小助手</text>
+    <text class="brand-sub" user-select>记录生活 · 管理日常</text>
+  </view>
+
+  <view class="form-card">
+    <view class="seg">
+      <view class="seg-item {{mode === 'login' ? 'on' : ''}}" bindtap="switchMode" data-mode="login"><text user-select>登录</text></view>
+      <view class="seg-item {{mode === 'register' ? 'on' : ''}}" bindtap="switchMode" data-mode="register"><text user-select>注册</text></view>
+    </view>
+
+    <view class="field">
+      <text class="field-label" user-select>账号</text>
+      <input class="field-input" placeholder="请输入账号" value="{{account}}" bindinput="onAccountInput" />
+    </view>
+    <view class="field">
+      <text class="field-label" user-select>密码</text>
+      <input class="field-input" placeholder="请输入密码（至少6位）" password value="{{password}}" bindinput="onPasswordInput" />
+    </view>
+    <view class="field" wx:if="{{mode === 'register'}}">
+      <text class="field-label" user-select>确认密码</text>
+      <input class="field-input" placeholder="再次输入密码" password value="{{confirm}}" bindinput="onConfirmInput" />
+    </view>
+
+    <button class="submit-btn" bindtap="handleSubmit"><text user-select>{{mode === 'login' ? '登 录' : '注 册'}}</text></button>
+  </view>
+
+  <view class="divider"><view class="line"></view><text user-select>或</text><view class="line"></view></view>
+
+  <button class="wx-btn" bindtap="handleWechat">
+    <image class="wx-icon" src="{{wxIcon}}" mode="aspectFit" />
+    <text user-select>微信一键登录</text>
+  </button>
+
+  <text class="tip" user-select>登录即表示同意《用户协议》与《隐私政策》</text>
+</view>

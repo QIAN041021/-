@@ -1,0 +1,124 @@
+<view class="screen theme-{{themeClass}}" style="--app-font-scale:{{appFontScale}};--app-font-weight:{{appFontWeight}}" bindtouchstart="onEdgeTouchStart" bindtouchmove="onEdgeTouchMove">
+  <view class="drawer-hamburger" hover-class="drawer-hamburger-tap" hover-stay-time="80" bindtap="onHamburgerTap"><text user-select>≡</text></view>
+  <view class="content-wrapper">
+    <view class="header">
+      <view class="header-left">
+        <text class="app-title" user-select>📦 取件码</text>
+      </view>
+      <view class="add-cat-btn" bindtap="openCatModal">
+        <image src="{{plusIcon}}" mode="aspectFit" style="width:30rpx;height:30rpx;" />
+        <text user-select>新建分类</text>
+      </view>
+    </view>
+
+    <view class="pickup-tip"><text user-select>按快递驿站分类管理取件码，勾选表示已取件。</text></view>
+
+    <!-- 空状态 -->
+    <view class="empty-box" wx:if="{{!categories.length}}">
+      <view class="empty-emoji"><text user-select>📭</text></view>
+      <view class="empty-title"><text user-select>还没有取件码分类</text></view>
+      <view class="empty-sub"><text user-select>点击右上角「新建分类」，先建一个快递驿站吧</text></view>
+    </view>
+
+    <!-- 分类卡片 -->
+    <view
+      class="cat-card"
+      wx:for="{{categories}}"
+      wx:key="id"
+      wx:for-item="cat"
+      style="background:{{cat.colorBg}};"
+    >
+      <view class="cat-header">
+        <view class="cat-title-wrap" bindtap="openEditCat" data-id="{{cat.id}}">
+          <view class="cat-dot" style="background:{{cat.colorAccent}}"></view>
+          <text class="cat-name" style="color:{{cat.colorText}}" user-select>{{cat.stationName}}</text>
+          <text class="cat-edit-hint" user-select>编辑</text>
+        </view>
+        <view class="cat-actions">
+          <view class="cat-progress" style="color:{{cat.colorText}}"><text user-select>{{cat.progressText}}</text></view>
+          <view class="cat-del" data-id="{{cat.id}}" bindtap="deleteCat"><image src="{{delIcon}}" mode="aspectFit" style="width:22rpx;height:22rpx;" /></view>
+        </view>
+      </view>
+
+      <!-- 取件码列表 -->
+      <view class="code-list" wx:if="{{cat.codes.length}}">
+        <view
+          class="code-item {{c.picked ? 'picked' : ''}}"
+          wx:for="{{cat.codes}}"
+          wx:key="id"
+          wx:for-item="c"
+        >
+          <view
+            class="code-check {{c.picked ? 'checked' : ''}}"
+            style="{{c.picked ? 'background:' + cat.colorAccent + ';border-color:' + cat.colorAccent + ';' : 'border-color:' + cat.colorAccent + ';'}}"
+            data-cat="{{cat.id}}"
+            data-index="{{c.index}}"
+            bindtap="toggleCode"
+          >
+            <image wx:if="{{c.picked}}" src="{{checkIcon}}" mode="aspectFit" style="width:28rpx;height:28rpx;" />
+          </view>
+          <text class="code-text" style="color:{{cat.colorText}}" user-select>{{c.code}}</text>
+          <view class="code-del" data-cat="{{cat.id}}" data-index="{{c.index}}" bindtap="deleteCode"><image src="{{delIcon}}" mode="aspectFit" style="width:20rpx;height:20rpx;" /></view>
+        </view>
+      </view>
+
+      <view class="code-empty" wx:if="{{!cat.codes.length}}"><text user-select>还没有取件码，点下面按钮添加</text></view>
+
+      <view class="add-code-btn" style="color:{{cat.colorText}};border-color:{{cat.colorAccent}}" data-id="{{cat.id}}" bindtap="openCodeModal">
+        <image src="{{plusIcon}}" mode="aspectFit" style="width:26rpx;height:26rpx;" />
+        <text user-select>添加取件码</text>
+      </view>
+    </view>
+  </view>
+</view>
+
+<!-- ===== 新建 / 编辑分类弹窗 ===== -->
+<view class="modal-overlay theme-{{themeClass}}" wx:if="{{showCatModal}}" bindtap="closeCatModal" style="--app-font-scale:{{appFontScale}};--app-font-weight:{{appFontWeight}}">
+  <view class="modal-sheet" catchtap="noop">
+    <view class="modal-handle"></view>
+    <view class="modal-title"><text user-select>{{editingCatId ? '编辑驿站' : '新建分类'}}</text></view>
+    <view class="modal-input-group">
+      <text class="modal-label" user-select>驿站名称</text>
+      <input class="modal-input" placeholder="如：菜鸟驿站(1号楼)、丰巢柜…" value="{{catName}}" bindinput="onCatName" confirm-type="done" />
+    </view>
+    <view class="modal-input-group">
+      <text class="modal-label" user-select>分类色调（马卡龙浅色）</text>
+      <view class="color-swatches" hover-class="pill-tap" hover-stay-time="80">
+        <view
+          class="color-swatch {{catColor === item.key ? 'selected' : ''}}" hover-class="pill-tap" hover-stay-time="80"
+          wx:for="{{colorOptions}}"
+          wx:key="key"
+          wx:for-item="item"
+          style="background:{{item.bg}};border-color:{{item.accent}}"
+          data-key="{{item.key}}"
+          bindtap="selectCatColor"
+        >
+          <view wx:if="{{catColor === item.key}}" class="swatch-tick" style="background:{{item.accent}}"></view>
+        </view>
+      </view>
+    </view>
+    <view class="modal-buttons">
+      <button class="modal-btn-cancel" bindtap="closeCatModal"><text user-select>取消</text></button>
+      <button class="modal-btn-confirm" bindtap="confirmCat"><text user-select>{{editingCatId ? '保存' : '创建'}}</text></button>
+    </view>
+  </view>
+</view>
+
+<!-- ===== 添加取件码弹窗 ===== -->
+<view class="modal-overlay theme-{{themeClass}}" wx:if="{{showCodeModal}}" bindtap="closeCodeModal" style="--app-font-scale:{{appFontScale}};--app-font-weight:{{appFontWeight}}">
+  <view class="modal-sheet" catchtap="noop">
+    <view class="modal-handle"></view>
+    <view class="modal-title"><text user-select>添加取件码</text></view>
+    <view class="modal-tip"><text user-select>可一次粘贴多个，用空格 / 逗号 / 换行分隔，会自动拆分。</text></view>
+    <view class="modal-input-group">
+      <text class="modal-label" user-select>取件码</text>
+      <textarea class="modal-textarea" placeholder="如：A123-456 B789-012 丰巢-88" value="{{codeInput}}" bindinput="onCodeInput" auto-height maxlength="-1" />
+    </view>
+    <view class="modal-buttons">
+      <button class="modal-btn-cancel" bindtap="closeCodeModal"><text user-select>取消</text></button>
+      <button class="modal-btn-confirm" bindtap="confirmAddCodes"><text user-select>添加</text></button>
+    </view>
+  </view>
+</view>
+
+<drawer id="drawer" show="{{drawerShow}}" pages="{{drawerPages}}" bind:close="onDrawerClose" bind:navigate="onDrawerNavigate" />

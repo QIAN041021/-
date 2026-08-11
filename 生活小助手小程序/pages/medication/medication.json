@@ -1,0 +1,6 @@
+{
+  "usingComponents": {
+    "drawer": "/components/drawer/index"
+  },
+  "navigationBarTitleText": "药物记录"
+}

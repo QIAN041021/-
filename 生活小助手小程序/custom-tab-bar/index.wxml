@@ -1,0 +1,15 @@
+<view class="tab-bar" style="background:{{tabBarBg}};">
+  <view class="tab-pill">
+    <view
+      wx:for="{{list}}"
+      wx:key="pagePath"
+      class="tab-item {{selected === index ? 'active' : 'inactive'}}"
+      style="{{selected === index ? 'background:' + activeBg + ';' : ''}}"
+      data-index="{{index}}"
+      bindtap="onTap"
+    >
+      <image class="tab-icon" src="{{selected === index ? item.iconAc : item.iconIn}}" mode="aspectFit" />
+      <text class="tab-label" user-select>{{item.text}}</text>
+    </view>
+  </view>
+</view>

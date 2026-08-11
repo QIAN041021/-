@@ -1,0 +1,2 @@
+/* 记账页样式主要来自 app.wxss */
+.screen { background: #FDF8F4; }

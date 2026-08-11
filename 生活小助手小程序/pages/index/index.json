@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "生活小助手",
+  "navigationBarBackgroundColor": "#FDF8F4",
+  "navigationBarTextStyle": "black",
+  "usingComponents": { "drawer": "/components/drawer/index" }
+}

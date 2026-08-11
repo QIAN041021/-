@@ -1,0 +1,57 @@
+.drawer-mask {
+  position: fixed;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.28);
+  z-index: 999;
+  display: flex;
+}
+
+.drawer-panel {
+  width: 64%;
+  max-width: 280px;
+  height: 100%;
+  background: #FBF1EA;
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+  padding: 24rpx 0;
+}
+
+.drawer-title {
+  padding: 16rpx 28rpx 12rpx;
+  font-size: 26rpx;
+  color: #993556;
+  font-weight: 500;
+}
+
+.drawer-list {
+  flex: 1;
+  overflow-y: auto;
+}
+
+.drawer-item {
+  padding: 28rpx 28rpx;
+  font-size: 30rpx;
+  color: #3A2E2A;
+  border-left: 6rpx solid transparent;
+}
+
+.drawer-item.active {
+  background: #FFFFFF;
+  color: #993556;
+  font-weight: 500;
+  border-left-color: #D4537E;
+}
+
+.drawer-item-tap {
+  background: rgba(212, 83, 126, 0.10);
+}
+
+.drawer-tip {
+  padding: 18rpx 28rpx;
+  font-size: 22rpx;
+  color: #B4B2A9;
+}

@@ -1,0 +1,134 @@
+<view class="screen theme-{{themeClass}}" style="--app-font-scale:{{appFontScale}};--app-font-weight:{{appFontWeight}}" bindtouchstart="onEdgeTouchStart" bindtouchmove="onEdgeTouchMove">
+  <view class="drawer-hamburger" hover-class="drawer-hamburger-tap" hover-stay-time="80" bindtap="onHamburgerTap"><text user-select>≡</text></view>
+  <view class="content-wrapper">
+
+    <!-- 进度条 -->
+    <view class="card" wx:for="{{categories}}" wx:key="id" wx:for-item="cat">
+      <view class="card-header">
+        <view class="card-header-left">
+          <text class="card-title" user-select>{{cat.name}}</text>
+        </view>
+        <view class="cat-header-actions">
+          <view class="cat-edit-btn" data-id="{{cat.id}}" bindtap="openEditCatModal">
+            <image src="{{editIcon}}" mode="aspectFit" style="width:24rpx;height:24rpx;" />
+          </view>
+          <view class="cat-del-btn" data-id="{{cat.id}}" bindtap="deleteCat">
+            <image src="{{delIcon}}" mode="aspectFit" style="width:20rpx;height:20rpx;" />
+          </view>
+        </view>
+      </view>
+
+      <view class="supplies-grid" wx:if="{{cat.items.length}}">
+        <view class="supply-item {{s.colorClass}}" wx:for="{{cat.items}}" wx:key="id" wx:for-item="s"
+              data-id="{{s.id}}" bindtap="openEditModal">
+          <view class="supply-delete" data-id="{{s.id}}" catchtap="deleteSupply">
+            <image src="{{delIcon}}" style="width:20rpx;height:20rpx;" />
+          </view>
+          <view class="supply-icon-wrap">
+            <image src="{{s.icon}}" style="width:48rpx;height:48rpx;" />
+          </view>
+          <text class="supply-name" user-select>{{s.name}}</text>
+          <view class="supply-bar">
+            <view class="supply-bar-fill" style="width: {{s.percent}}%; background: {{s.barColor}};"></view>
+          </view>
+          <text class="supply-percent" user-select>剩余 {{s.percent}}% · 点击修改</text>
+        </view>
+      </view>
+      <view wx:else class="empty-tip"><text user-select>还没有项目，点击下方添加</text></view>
+
+      <view class="btn btn-green" data-catid="{{cat.id}}" bindtap="openAddModal">
+        <text class="btn-text" user-select>添加项目</text>
+      </view>
+    </view>
+
+    <!-- 添加分类按钮 -->
+    <view class="btn btn-pink" bindtap="openAddCatModal">
+      <text class="btn-text" user-select>+ 新建分类</text>
+    </view>
+
+  </view>
+</view>
+
+<!-- 添加物品弹窗 -->
+<view class="modal-overlay theme-{{themeClass}}" wx:if="{{showAddModal}}" bindtap="closeAddModal" style="--app-font-scale:{{appFontScale}};--app-font-weight:{{appFontWeight}}">
+  <view class="modal-sheet" catchtap="noop">
+    <view class="modal-handle"></view>
+    <view class="modal-title"><text user-select>添加项目</text></view>
+
+    <view class="modal-input-group">
+      <text class="modal-label" user-select>选择分类</text>
+      <view class="modal-cat-row">
+        <view class="modal-cat-pill {{addModalCatId === c.id ? 'selected' : ''}}"
+              wx:for="{{categories}}" wx:key="id" wx:for-item="c"
+              data-catid="{{c.id}}" bindtap="selectAddCat"><text user-select>{{c.name}}</text></view>
+      </view>
+    </view>
+
+    <view class="modal-input-group">
+      <text class="modal-label" user-select>名称</text>
+      <input class="modal-input" placeholder="如：洗衣液" value="{{supplyName}}" bindinput="onSupplyName" />
+    </view>
+
+    <view class="modal-input-group">
+      <text class="modal-label" user-select>颜色</text>
+      <view class="supply-color-row">
+        <view class="supply-color-dot {{c.selected ? 'selected' : ''}}"
+              wx:for="{{colorOptions}}" wx:key="colorClass" wx:for-item="c"
+              style="background: {{c.gradient}};"
+              data-index="{{index}}" bindtap="selectColor">
+        </view>
+      </view>
+    </view>
+
+    <view class="modal-input-group">
+      <text class="modal-label" user-select>剩余比例：{{supplyPercent}}%</text>
+      <view class="supply-slider">
+        <slider min="0" max="100" value="{{supplyPercent}}" activeColor="{{themePrimary}}" blockColor="{{themePrimary}}" bindchange="onSupplyPercent" />
+      </view>
+    </view>
+
+    <view class="modal-buttons">
+      <button class="modal-btn-cancel" bindtap="closeAddModal"><text user-select>取消</text></button>
+      <button class="modal-btn-confirm" bindtap="confirmAddSupply"><text user-select>确认添加</text></button>
+    </view>
+  </view>
+</view>
+
+<!-- 修改比例弹窗 -->
+<view class="modal-overlay theme-{{themeClass}}" wx:if="{{showEditModal}}" bindtap="closeEditModal" style="--app-font-scale:{{appFontScale}};--app-font-weight:{{appFontWeight}}">
+  <view class="modal-sheet" catchtap="noop">
+    <view class="modal-handle"></view>
+    <view class="modal-title"><text user-select>{{editSupplyName}}</text></view>
+
+    <view class="percent-display"><text user-select>{{editPercent}}</text><text user-select>%</text></view>
+
+    <view class="supply-slider">
+      <slider min="0" max="100" value="{{editPercent}}" activeColor="{{themePrimary}}" blockColor="{{themePrimary}}" bindchange="onEditPercent" />
+    </view>
+
+    <view class="modal-buttons">
+      <button class="modal-btn-cancel" bindtap="closeEditModal"><text user-select>取消</text></button>
+      <button class="modal-btn-confirm" bindtap="confirmEditPercent"><text user-select>确认修改</text></button>
+    </view>
+  </view>
+</view>
+
+<!-- 分类编辑弹窗 -->
+<view class="modal-overlay theme-{{themeClass}}" wx:if="{{showCatModal}}" bindtap="closeCatModal" style="--app-font-scale:{{appFontScale}};--app-font-weight:{{appFontWeight}}">
+  <view class="modal-sheet" catchtap="noop">
+    <view class="modal-handle"></view>
+    <view class="modal-title"><text user-select>{{catModalMode === 'add' ? '新建分类' : '编辑分类'}}</text></view>
+
+    <view class="modal-input-group">
+      <text class="modal-label" user-select>分类名称</text>
+      <input class="modal-input" placeholder="如：任务进度" value="{{catName}}" bindinput="onCatName" />
+    </view>
+
+    <view class="modal-buttons">
+      <button class="modal-btn-cancel" bindtap="closeCatModal"><text user-select>取消</text></button>
+      <button class="modal-btn-confirm" bindtap="confirmCatModal"><text user-select>{{catModalMode === 'add' ? '创建' : '保存'}}</text></button>
+    </view>
+  </view>
+</view>
+
+<drawer id="drawer" show="{{drawerShow}}" pages="{{drawerPages}}" bind:close="onDrawerClose" bind:navigate="onDrawerNavigate" />

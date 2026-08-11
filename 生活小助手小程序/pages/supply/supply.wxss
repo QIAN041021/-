@@ -1,0 +1,41 @@
+/* 用品页样式主要来自 app.wxss，此处仅做页面级微调 */
+.screen { background: #FDF8F4; }
+
+/* 剩余比例滑块 */
+.supply-slider {
+  margin: 16rpx 0 8rpx;
+}
+.supply-slider slider {
+  width: 100%;
+}
+
+/* 颜色选择圆点（用品用） */
+.supply-color-row {
+  display: flex;
+  gap: 20rpx;
+  flex-wrap: wrap;
+}
+.supply-color-dot {
+  width: 72rpx;
+  height: 72rpx;
+  border-radius: 36rpx;
+  border: 4rpx solid transparent;
+}
+.supply-color-dot.selected {
+  border-color: #5E4B3C;
+  transform: scale(1.1);
+}
+
+/* 快速修改比例弹窗中的滑块区域 */
+.percent-display {
+  text-align: center;
+  font-size: calc(56rpx * var(--app-font-scale, 1));
+  font-weight: 700;
+  color: #5E4B3C;
+  padding: 16rpx 0 24rpx;
+}
+.percent-display text {
+  font-size: calc(28rpx * var(--app-font-scale, 1));
+  color: #C88E8E;
+  font-weight: 500;
+}

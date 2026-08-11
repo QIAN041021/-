@@ -1,0 +1,87 @@
+/* 菜谱页样式主要来自 app.wxss */
+.screen { background: #FDF8F4; }
+
+/* 菜谱卡片按压反馈（提示可点开） */
+.recipe-item-tap {
+  background: var(--theme-pill-bg);
+  transform: scale(0.99);
+}
+.recipe-arrow {
+  align-self: center;
+  font-size: calc(44rpx * var(--app-font-scale, 1));
+  color: var(--theme-text-secondary);
+  font-weight: 300;
+  line-height: 1;
+  padding-left: 8rpx;
+}
+
+/* 菜谱详情弹窗 */
+.recipe-detail-body {
+  max-height: 62vh;
+  margin: 8rpx 0 16rpx;
+}
+.recipe-detail-hero {
+  width: 100%;
+  height: 320rpx;
+  border-radius: 28rpx;
+  overflow: hidden;
+  background: var(--theme-pill-bg);
+  margin-bottom: 24rpx;
+}
+.recipe-detail-hero.empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.recipe-detail-hero image {
+  width: 100%;
+  height: 100%;
+}
+.recipe-detail-section {
+  margin-bottom: 28rpx;
+}
+.recipe-detail-label {
+  display: block;
+  font-size: calc(26rpx * var(--app-font-scale, 1));
+  font-weight: 600;
+  color: var(--theme-text-secondary);
+  margin-bottom: 16rpx;
+}
+.recipe-detail-ingredients {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16rpx;
+}
+.recipe-detail-empty {
+  font-size: calc(26rpx * var(--app-font-scale, 1));
+  color: var(--theme-text-secondary);
+}
+.recipe-detail-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+}
+.recipe-step {
+  display: flex;
+  gap: 16rpx;
+  align-items: flex-start;
+}
+.recipe-step-num {
+  flex-shrink: 0;
+  width: 44rpx;
+  height: 44rpx;
+  border-radius: 50%;
+  background: var(--theme-primary);
+  color: #333;
+  font-weight: 700;
+  font-size: calc(24rpx * var(--app-font-scale, 1));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.recipe-step-text {
+  flex: 1;
+  font-size: calc(28rpx * var(--app-font-scale, 1));
+  color: var(--theme-text);
+  line-height: 1.6;
+}

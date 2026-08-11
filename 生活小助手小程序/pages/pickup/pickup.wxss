@@ -1,0 +1,227 @@
+/* 取件码页面样式：分类卡片背景用马卡龙浅色调（内联注入），
+   页面容器与按钮沿用主题变量，保证整体协调不违和。 */
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12rpx;
+}
+.app-title {
+  font-size: calc(38rpx * var(--app-font-scale, 1));
+  font-weight: 700;
+  color: var(--theme-text);
+}
+.add-cat-btn {
+  display: flex;
+  align-items: center;
+  padding: 12rpx 24rpx;
+  border-radius: 30rpx;
+  background: var(--theme-primary);
+  box-shadow: 0 4rpx 12rpx var(--theme-shadow-light);
+}
+.add-cat-btn text {
+  font-size: calc(24rpx * var(--app-font-scale, 1));
+  color: #fff;
+  font-weight: 600;
+  margin-left: 8rpx;
+}
+.pickup-tip {
+  font-size: calc(22rpx * var(--app-font-scale, 1));
+  color: var(--theme-text-secondary);
+  margin-bottom: 20rpx;
+}
+
+/* 空状态 */
+.empty-box {
+  margin-top: 80rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.empty-emoji { font-size: calc(96rpx * var(--app-font-scale, 1)); }
+.empty-title {
+  font-size: calc(30rpx * var(--app-font-scale, 1));
+  color: var(--theme-text);
+  font-weight: 600;
+  margin-top: 16rpx;
+}
+.empty-sub {
+  font-size: calc(24rpx * var(--app-font-scale, 1));
+  color: var(--theme-text-secondary);
+  margin-top: 10rpx;
+}
+
+/* 分类卡片 */
+.cat-card {
+  border-radius: 28rpx;
+  padding: 24rpx;
+  margin-bottom: 24rpx;
+  box-shadow: 0 6rpx 18rpx var(--theme-shadow-xs);
+}
+.cat-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16rpx;
+}
+.cat-title-wrap {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 0;
+}
+.cat-dot {
+  width: 20rpx;
+  height: 20rpx;
+  border-radius: 50%;
+  margin-right: 14rpx;
+  flex: 0 0 auto;
+}
+.cat-name {
+  font-size: calc(32rpx * var(--app-font-scale, 1));
+  font-weight: 700;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.cat-edit-hint {
+  font-size: calc(20rpx * var(--app-font-scale, 1));
+  margin-left: 12rpx;
+  opacity: 0.55;
+  flex: 0 0 auto;
+}
+.cat-actions {
+  display: flex;
+  align-items: center;
+  flex: 0 0 auto;
+}
+.cat-progress {
+  font-size: calc(22rpx * var(--app-font-scale, 1));
+  margin-right: 16rpx;
+}
+.cat-del {
+  width: 44rpx;
+  height: 44rpx;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.06);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 取件码列表 */
+.code-list {
+  display: flex;
+  flex-direction: column;
+}
+.code-item {
+  display: flex;
+  align-items: center;
+  padding: 14rpx 0;
+  border-bottom: 2rpx solid rgba(0, 0, 0, 0.05);
+}
+.code-item:last-child { border-bottom: none; }
+.code-check {
+  width: 40rpx;
+  height: 40rpx;
+  border-radius: 50%;
+  border-width: 3rpx;
+  border-style: solid;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  margin-right: 18rpx;
+  box-sizing: border-box;
+}
+.code-text {
+  flex: 1;
+  font-size: calc(30rpx * var(--app-font-scale, 1));
+  font-weight: 600;
+  letter-spacing: 1rpx;
+}
+.code-item.picked .code-text {
+  text-decoration: line-through;
+  opacity: 0.5;
+}
+.code-del {
+  width: 40rpx;
+  height: 40rpx;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.05);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+}
+.code-empty {
+  font-size: calc(22rpx * var(--app-font-scale, 1));
+  color: var(--theme-text-secondary);
+  opacity: 0.7;
+  padding: 12rpx 0;
+}
+.add-code-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 16rpx;
+  height: 72rpx;
+  border-radius: 20rpx;
+  border-width: 2rpx;
+  border-style: dashed;
+  font-size: calc(26rpx * var(--app-font-scale, 1));
+  font-weight: 600;
+}
+.add-code-btn image { margin-right: 10rpx; }
+
+/* 新建分类：色调选择 */
+.color-swatches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18rpx;
+  margin-top: 12rpx;
+}
+.color-swatch {
+  width: 76rpx;
+  height: 76rpx;
+  border-radius: 24rpx;
+  border-width: 4rpx;
+  border-style: solid;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  position: relative;
+}
+.color-swatch.selected {
+  box-shadow: 0 0 0 6rpx var(--theme-card-bg), 0 0 0 10rpx var(--theme-primary), 0 8rpx 20rpx rgba(0, 0, 0, 0.12);
+  transform: scale(1.08);
+}
+.color-swatch.pill-tap { transform: scale(0.96); }
+.color-swatch.selected.pill-tap { transform: scale(1.02); }
+.swatch-tick {
+  width: 28rpx;
+  height: 28rpx;
+  border-radius: 50%;
+}
+
+/* 添加取件码弹窗 */
+.modal-tip {
+  font-size: calc(22rpx * var(--app-font-scale, 1));
+  color: var(--theme-text-secondary);
+  margin: 4rpx 8rpx 16rpx;
+  line-height: 1.4;
+}
+.modal-textarea {
+  width: 100%;
+  min-height: 160rpx;
+  background: var(--theme-card-bg);
+  border: 3rpx solid var(--theme-border);
+  border-radius: 24rpx;
+  padding: 20rpx;
+  font-size: calc(28rpx * var(--app-font-scale, 1));
+  font-weight: 500;
+  color: var(--theme-text);
+  box-sizing: border-box;
+}

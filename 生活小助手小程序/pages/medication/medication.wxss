@@ -1,0 +1,213 @@
+/* ===== 药物记录页 — 仅保留页面专属样式 =====
+   通用类（.screen / .drawer-hamburger / .content-wrapper / .card / .card-header /
+   .card-title / .empty-tip / .modal-overlay / .modal-sheet / .modal-handle /
+   .modal-title / .modal-input-group / .modal-label / .modal-input / .modal-textarea /
+   .modal-cat-pill / .modal-buttons / .modal-btn-cancel / .modal-btn-confirm）
+   均在 app.wxss 全局定义，此处不重复。 */
+
+/* 新建按钮（卡片右上角 pill） */
+.med-add-btn {
+  font-size: calc(26rpx * var(--app-font-scale, 1));
+  font-weight: 600;
+  color: #FFFFFF;
+  background: var(--theme-primary);
+  padding: 12rpx 28rpx;
+  border-radius: 32rpx;
+  box-shadow: 0 4rpx 12rpx rgba(var(--theme-primary-rgb), 0.3);
+}
+.med-add-btn-tap {
+  opacity: 0.85;
+  transform: scale(0.96);
+}
+
+/* 通用按下态（编辑/删除/切换按钮共用） */
+.med-pill-tap {
+  opacity: 0.82;
+  transform: scale(0.96);
+}
+
+/* ===== 人物档案卡片 ===== */
+.profile-card {
+  display: flex;
+  flex-direction: column;
+  gap: 8rpx;
+}
+
+.profile-switch {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12rpx;
+}
+
+.profile-switch-btn {
+  font-size: calc(32rpx * var(--app-font-scale, 1));
+  font-weight: 700;
+  color: var(--theme-text);
+  background: var(--theme-pill-bg);
+  padding: 12rpx 28rpx;
+  border-radius: 32rpx;
+}
+
+.caret {
+  color: var(--theme-text-secondary);
+  font-size: calc(24rpx * var(--app-font-scale, 1));
+}
+
+.profile-actions {
+  display: flex;
+  gap: 16rpx;
+}
+
+.med-edit-btn,
+.med-del-btn {
+  font-size: calc(24rpx * var(--app-font-scale, 1));
+  font-weight: 600;
+  padding: 10rpx 22rpx;
+  border-radius: 24rpx;
+  text-align: center;
+}
+
+.med-edit-btn {
+  color: var(--theme-text);
+  background: var(--theme-pill-bg);
+}
+
+.med-del-btn {
+  color: #CF4F4F;
+  background: rgba(207, 79, 79, 0.1);
+}
+
+.profile-field {
+  display: flex;
+  align-items: baseline;
+  padding: 8rpx 0;
+}
+
+.pf-label {
+  width: 160rpx;
+  flex: 0 0 auto;
+  font-size: calc(26rpx * var(--app-font-scale, 1));
+  font-weight: 600;
+  color: var(--theme-text-secondary);
+}
+
+.pf-value {
+  flex: 1;
+  font-size: calc(28rpx * var(--app-font-scale, 1));
+  font-weight: 500;
+  color: var(--theme-text);
+}
+
+/* ===== 药物列表 ===== */
+.med-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20rpx;
+}
+
+.med-card {
+  display: flex;
+  background: var(--theme-card-bg);
+  border: 3rpx solid var(--theme-border);
+  border-radius: 32rpx;
+  padding: 24rpx;
+  box-shadow: 0 4rpx 14rpx var(--theme-shadow-light);
+}
+
+.med-thumb {
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: 20rpx;
+  background: var(--theme-pill-bg);
+  flex: 0 0 auto;
+}
+
+.med-thumb-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--theme-text-secondary);
+  font-size: calc(24rpx * var(--app-font-scale, 1));
+}
+
+.med-info {
+  flex: 1;
+  margin-left: 20rpx;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.med-name {
+  font-size: calc(30rpx * var(--app-font-scale, 1));
+  font-weight: 700;
+  color: var(--theme-text);
+}
+
+.med-sub {
+  font-size: calc(24rpx * var(--app-font-scale, 1));
+  color: var(--theme-text-secondary);
+  margin-top: 4rpx;
+}
+
+.med-expiry {
+  font-size: calc(24rpx * var(--app-font-scale, 1));
+  color: #CF4F4F;
+  margin-top: 4rpx;
+  font-weight: 600;
+}
+
+.med-actions {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 12rpx;
+  flex: 0 0 auto;
+  margin-left: 16rpx;
+}
+
+/* ===== 药物图片上传区 ===== */
+.med-upload {
+  width: 160rpx;
+  height: 160rpx;
+  border-radius: 20rpx;
+  background: var(--theme-pill-bg);
+  border: 3rpx dashed var(--theme-primary);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.med-upload-img {
+  width: 100%;
+  height: 100%;
+}
+
+.med-upload-empty {
+  color: var(--theme-text-secondary);
+  font-size: calc(24rpx * var(--app-font-scale, 1));
+}
+
+.med-upload-del {
+  position: absolute;
+  top: 6rpx;
+  right: 6rpx;
+  width: 40rpx;
+  height: 40rpx;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.5);
+  color: #FFFFFF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 30rpx;
+}
+
+/* 日期选择器输入框 */
+.modal-input-picker {
+  display: flex;
+  align-items: center;
+}

@@ -1,0 +1,132 @@
+<view class="screen theme-{{themeClass}}" style="--app-font-scale:{{appFontScale}};--app-font-weight:{{appFontWeight}}" bindtouchstart="onEdgeTouchStart" bindtouchmove="onEdgeTouchMove">
+  <view class="drawer-hamburger" hover-class="drawer-hamburger-tap" hover-stay-time="80" bindtap="onHamburgerTap"><text user-select>≡</text></view>
+  <view class="content-wrapper">
+
+    <!-- Tab 切换 -->
+    <view class="settings-tab-bar">
+      <view class="settings-tab {{activeTab === 'pages' ? 'on' : ''}}" data-tab="pages" bindtap="switchTab"><text user-select>页面管理</text></view>
+      <view class="settings-tab {{activeTab === 'theme' ? 'on' : ''}}" data-tab="theme" bindtap="switchTab"><text user-select>色调调整</text></view>
+      <view class="settings-tab {{activeTab === 'feedback' ? 'on' : ''}}" data-tab="feedback" bindtap="switchTab"><text user-select>意见反馈</text></view>
+      <view class="settings-tab {{activeTab === 'font' ? 'on' : ''}}" data-tab="font" bindtap="switchTab"><text user-select>字体</text></view>
+    </view>
+
+    <!-- 页面管理 -->
+    <view class="card" wx:if="{{activeTab === 'pages'}}">
+      <view class="card-header">
+        <view class="card-header-left"><text class="card-title" user-select>导航栏排序与显示</text></view>
+      </view>
+      <view class="settings-page-tip"><text user-select>前 4 个位置固定显示这些页面（隐藏或调整顺序来选择）。底部栏第 5 个位置会自动显示你最近从侧边栏打开的页面。</text></view>
+
+      <view class="settings-page-list">
+        <view class="settings-page-item" wx:for="{{pageList}}" wx:key="path" wx:for-item="p" wx:for-index="idx">
+          <text class="settings-page-icon" user-select>{{p.icon}}</text>
+          <text class="settings-page-name" user-select>{{p.name}}</text>
+
+          <view class="settings-page-actions">
+            <view class="settings-arrow-btn {{idx === 0 ? 'disabled' : ''}}" data-index="{{idx}}" bindtap="moveUp"><text user-select>↑</text></view>
+            <view class="settings-arrow-btn {{idx === pageList.length - 1 ? 'disabled' : ''}}" data-index="{{idx}}" bindtap="moveDown"><text user-select>↓</text></view>
+
+            <view class="settings-toggle {{p.hidden ? 'off' : 'on'}} {{!p.canHide ? 'locked' : ''}}"
+                  data-path="{{p.path}}" bindtap="toggleHide">
+              <view class="settings-toggle-knob"></view>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 可加入底部栏的页面（第5动态位） -->
+    <view class="card" wx:if="{{activeTab === 'pages'}}">
+      <view class="card-header">
+        <view class="card-header-left"><text class="card-title" user-select>可加入底部栏的页面</text></view>
+      </view>
+      <view class="settings-page-tip"><text user-select>开启后，你从侧边栏打开该页面时，它会自动占据底部栏第 5 个位置；关闭后若它正占第 5 位会自动退回默认页。</text></view>
+
+      <view class="settings-page-list">
+        <view class="settings-page-item" wx:for="{{extraList}}" wx:key="path" wx:for-item="p">
+          <text class="settings-page-icon" user-select>{{p.icon}}</text>
+          <text class="settings-page-name" user-select>{{p.name}}</text>
+
+          <view class="settings-page-actions">
+            <view class="settings-toggle {{p.inNavbar ? 'on' : 'off'}} {{p.locked ? 'locked' : ''}}"
+                  data-path="{{p.path}}" bindtap="toggleNavbar">
+              <view class="settings-toggle-knob"></view>
+            </view>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 色调调整 -->
+    <view class="card" wx:if="{{activeTab === 'theme'}}">
+      <view class="card-header">
+        <view class="card-header-left"><text class="card-title" user-select>选择主题色调</text></view>
+      </view>
+      <view class="settings-page-tip"><text user-select>点击选择喜欢的整体色调，导航栏和页面背景会随之变化</text></view>
+
+      <view class="settings-theme-grid">
+        <view class="settings-theme-card {{t.selected ? 'selected' : ''}}"
+              wx:for="{{themes}}" wx:key="name" wx:for-item="t"
+              data-name="{{t.name}}" bindtap="selectTheme">
+          <view class="settings-theme-preview" style="background:{{t.bg}};">
+            <view class="settings-theme-dot" style="background:{{t.primary}};"></view>
+            <view class="settings-theme-dot" style="background:{{t.accent}};"></view>
+          </view>
+          <text class="settings-theme-label" user-select>{{t.label}}</text>
+          <view class="settings-theme-check" wx:if="{{t.selected}}"><text user-select>✓</text></view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 字体大小与粗细 -->
+    <view class="card" wx:if="{{activeTab === 'font'}}">
+      <view class="card-header">
+        <view class="card-header-left"><text class="card-title" user-select>字体大小与粗细</text></view>
+      </view>
+      <view class="settings-page-tip"><text user-select>调整后所有页面（含弹窗）立即生效，下次打开自动恢复</text></view>
+
+      <view class="font-row">
+        <text class="font-label" user-select>字体大小</text>
+        <text class="font-value" user-select>{{fontScaleLabel}}</text>
+      </view>
+      <slider class="font-slider" min="0" max="3" value="{{fontScaleIndex}}" step="1"
+              activeColor="{{themePrimary}}" block-color="{{themePrimary}}"
+              bindchange="onFontScale" bindchanging="onFontScale" />
+      <view class="font-scale-ticks">
+        <text class="font-scale-tick" wx:for="{{fontScaleOptions}}" wx:key="label" user-select>{{item.label}}</text>
+      </view>
+
+      <view class="font-row font-row-gap">
+        <text class="font-label" user-select>字体粗细</text>
+      </view>
+      <view class="font-weight-row">
+        <view class="font-weight-pill {{fontWeight === item.value ? 'selected' : ''}}" hover-class="pill-tap" hover-stay-time="80"
+              wx:for="{{fontWeightOptions}}" wx:key="value" data-w="{{item.value}}" bindtap="onFontWeight">
+          <text class="font-weight-sample" style="font-weight:{{item.value}}" user-select>{{item.label}}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 意见反馈 -->
+    <view class="card" wx:if="{{activeTab === 'feedback'}}">
+      <view class="card-header">
+        <view class="card-header-left"><text class="card-title" user-select>给开发者的建议</text></view>
+      </view>
+      <view class="settings-page-tip"><text user-select>您的每一条建议都会让生活小助手变得更好</text></view>
+
+      <view class="settings-feedback-area">
+        <textarea class="settings-feedback-input" placeholder="写下您的建议或遇到的问题..."
+                  value="{{feedback}}" bindinput="onFeedback" maxlength="500"
+                  auto-height></textarea>
+        <text class="settings-feedback-count" user-select>{{feedback.length}}/500</text>
+      </view>
+
+      <view class="btn btn-green" bindtap="saveFeedback">
+        <text class="btn-text" user-select>提交建议</text>
+      </view>
+    </view>
+
+  </view>
+</view>
+
+<drawer id="drawer" show="{{drawerShow}}" pages="{{drawerPages}}" bind:close="onDrawerClose" bind:navigate="onDrawerNavigate" />

@@ -1,0 +1,6 @@
+{
+  "usingComponents": { "drawer": "/components/drawer/index" },
+  "navigationBarTitleText": "进度条",
+  "navigationBarBackgroundColor": "#FDF8F4",
+  "navigationBarTextStyle": "black"
+}

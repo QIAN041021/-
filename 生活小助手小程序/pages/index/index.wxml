@@ -1,0 +1,418 @@
+<view class="screen theme-{{themeClass}}" style="--app-font-scale:{{appFontScale}};--app-font-weight:{{appFontWeight}}" bindtouchstart="onEdgeTouchStart" bindtouchmove="onEdgeTouchMove">
+  <view class="drawer-hamburger" hover-class="drawer-hamburger-tap" hover-stay-time="80" bindtap="onHamburgerTap"><text user-select>≡</text></view>
+  <view class="content-wrapper">
+    <view class="header">
+      <view class="header-left">
+        <image src="{{brandIcon}}" mode="aspectFit" style="width:40rpx;height:40rpx;" />
+        <text class="app-title" user-select>生活小助手</text>
+      </view>
+    </view>
+
+    <!-- 用户信息卡片 -->
+    <view class="user-profile-card">
+      <view class="user-profile-main" bindtap="openProfileModal">
+        <view class="user-avatar-wrap" catchtap="chooseAvatar">
+          <image wx:if="{{userInfo.avatar}}" src="{{userInfo.avatar}}" mode="aspectFill" class="user-avatar" />
+          <view wx:else class="user-avatar-placeholder">
+            <text class="user-avatar-text" user-select>{{userInfo.nickname ? userInfo.nickname[0] : '我'}}</text>
+          </view>
+          <view class="user-avatar-edit"><text user-select>📷</text></view>
+        </view>
+        <view class="user-profile-info">
+          <text class="user-profile-name" user-select>{{userInfo.nickname || account || '未设置昵称'}}</text>
+          <view class="user-profile-tags">
+            <text class="user-profile-tag" wx:if="{{userInfo.gender}}" user-select>{{userInfo.gender}}</text>
+            <text class="user-profile-tag" wx:if="{{userInfo.age}}" user-select>{{userInfo.age}}岁</text>
+            <text class="user-profile-tag tag-id" user-select>ID: {{shortId}}</text>
+          </view>
+          <text class="user-profile-account" user-select>账号: {{account || '—'}}</text>
+        </view>
+      </view>
+      <view class="user-profile-settings" bindtap="goSettings">
+        <view class="settings-icon-btn">
+          <image src="{{settingsIcon}}" mode="aspectFit" style="width:32rpx;height:32rpx;" />
+        </view>
+        <text class="settings-icon-label" user-select>设置</text>
+      </view>
+    </view>
+
+    <view class="card">
+      <view class="card-header">
+        <view class="card-header-left">
+          <text class="card-title" user-select>今日生活指数</text>
+        </view>
+        <view class="manage-entry" bindtap="openManage">
+          <text class="manage-entry-text" user-select>管理</text>
+        </view>
+      </view>
+
+      <view class="life-index-grid">
+        <view
+          class="life-index-item"
+          style="background:{{item.bg}}"
+          wx:for="{{modules}}"
+          wx:key="id"
+          wx:for-item="item"
+          data-id="{{item.id}}"
+          bindtap="openModule"
+        >
+          <view class="life-index-item-header">
+            <image class="life-index-icon" src="{{item.icon}}" mode="aspectFit" style="background:rgba(255,255,255,0.45)" />
+            <view class="life-index-info">
+              <text class="life-index-label" user-select>{{item.label}}</text>
+              <text class="life-index-value" user-select>{{item.preview}}</text>
+            </view>
+            <image class="life-index-edit-icon" src="{{editIcon}}" mode="aspectFit" />
+          </view>
+
+          <view class="life-index-records" wx:if="{{item.rows.length || item.weight}}">
+            <view class="life-index-record" wx:if="{{item.weight}}">
+            <view class="life-index-weight-display">
+              <text class="life-index-weight-num" user-select>{{item.weight.value}}</text>
+              <text class="life-index-weight-unit" user-select>{{item.weight.unit || 'kg'}}</text>
+              <text class="life-index-weight-trend" style="color:{{item.weight.trendColor}}" user-select>{{item.weight.trend}}</text>
+            </view>
+            </view>
+            <view class="life-index-record" wx:for="{{item.rows}}" wx:key="text" wx:for-item="row">
+              <view class="life-index-record-bar" wx:if="{{row.barColor}}" style="background:{{row.barColor}}"></view>
+              <view class="life-index-record-dot {{row.done ? 'done' : ''}}" wx:else></view>
+              <text class="life-index-record-text {{row.done ? 'done' : ''}}" user-select>{{row.text}}</text>
+              <text class="life-index-record-meta" wx:if="{{row.meta}}" user-select>{{row.meta}}</text>
+            </view>
+            <view class="life-index-more" wx:if="{{item.more > 0}}"><text user-select>还有 {{item.more}} 项…</text></view>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>
+
+<!-- ===== 模块弹窗 ===== -->
+<view class="modal-overlay theme-{{themeClass}}" wx:if="{{activeModule}}" bindtap="closeModule" style="--app-font-scale:{{appFontScale}};--app-font-weight:{{appFontWeight}}">
+  <view class="modal-sheet" catchtap="noop">
+    <view class="modal-handle"></view>
+    <view class="modal-title"><text user-select>{{modalTitle}}</text></view>
+
+    <!-- 待办 -->
+    <block wx:if="{{activeModuleType === 'todo'}}">
+      <view class="li-input-row">
+        <input class="modal-input" placeholder="输入待办事项..." value="{{todoInput}}" bindinput="onTodoInput" confirm-type="done" bindconfirm="addTodo" />
+        <view class="li-add-btn" bindtap="addTodo"><image src="{{plusIcon}}" mode="aspectFit" style="width:32rpx;height:32rpx;" /></view>
+      </view>
+      <view wx:if="{{todoList.length}}">
+        <view class="li-progress-bar"><view class="li-progress-fill" style="width:{{todoProgress}}%"></view></view>
+        <view style="font-size:calc(22rpx * var(--app-font-scale, 1));color:var(--theme-text-secondary);margin-bottom:16rpx;"><text user-select>{{todoProgress}}% 已完成</text></view>
+      </view>
+      <scroll-view scroll-y class="li-module-body">
+        <view wx:if="{{!todoList.length}}" class="li-empty"><text user-select>还没有待办事项，添加一个吧</text></view>
+        <view class="li-todo-item {{t.done ? 'done' : ''}}" wx:for="{{todoList}}" wx:key="index" wx:for-item="t">
+          <view class="li-todo-check {{t.done ? 'done' : ''}}" data-index="{{t.index}}" bindtap="toggleTodo">
+            <image wx:if="{{t.done}}" src="{{checkIcon}}" mode="aspectFit" style="width:24rpx;height:24rpx;" />
+          </view>
+          <text class="li-todo-text" user-select>{{t.text}}</text>
+          <view class="li-del-btn" data-index="{{t.index}}" bindtap="deleteTodo"><image src="{{delIcon}}" mode="aspectFit" style="width:20rpx;height:20rpx;" /></view>
+        </view>
+      </scroll-view>
+    </block>
+
+    <!-- 打卡 -->
+    <block wx:if="{{activeModuleType === 'checkin'}}">
+      <view class="ci-header-row">
+        <text class="ci-section-title" user-select>我的打卡任务</text>
+        <view class="ci-new-btn" hover-class="pill-tap" hover-stay-time="80" bindtap="openCheckinCreate"><text user-select>＋ 新建打卡任务</text></view>
+      </view>
+      <scroll-view scroll-y class="li-module-body">
+        <view wx:if="{{!checkinList.length}}" class="li-empty"><text user-select>还没有打卡任务，点「新建打卡任务」开始吧</text></view>
+        <view class="li-checkin-card" wx:for="{{checkinList}}" wx:key="index" wx:for-item="c">
+          <view class="li-checkin-row">
+            <text class="li-checkin-name" user-select>{{c.name}}</text>
+            <view class="li-del-btn" data-index="{{c.index}}" bindtap="deleteCheckin"><image src="{{delIcon}}" mode="aspectFit" style="width:20rpx;height:20rpx;" /></view>
+          </view>
+
+          <view class="li-checkin-stats">
+            <view class="ci-stat">
+              <text class="ci-stat-num" user-select>{{c.totalDays}}</text>
+              <text class="ci-stat-label" user-select>总天数</text>
+            </view>
+            <view class="ci-stat">
+              <text class="ci-stat-num" user-select>{{c.doneCount}}</text>
+              <text class="ci-stat-label" user-select>已完成</text>
+            </view>
+            <view class="ci-stat">
+              <text class="ci-stat-num" user-select>{{c.progress}}%</text>
+              <text class="ci-stat-label" user-select>进度</text>
+            </view>
+          </view>
+          <view class="li-checkin-progress-bar"><view class="li-checkin-progress-fill" style="width:{{c.progress}}%"></view></view>
+
+          <!-- 按总天数生成的打卡方格：点击空白格打卡，单日仅一次 -->
+          <view class="li-checkin-grid">
+            <view class="li-checkin-cell {{item.checked ? 'checked' : ''}}"
+                  wx:for="{{c.cells}}" wx:key="ci" wx:for-item="item" wx:for-index="ci"
+                  data-index="{{c.index}}" data-cell="{{ci}}" bindtap="toggleCheckinCell">
+              <text class="li-checkin-cell-day" user-select>{{ci + 1}}</text>
+              <image wx:if="{{item.checked}}" src="{{checkIcon}}" class="li-checkin-cell-check" mode="aspectFit" />
+            </view>
+          </view>
+        </view>
+      </scroll-view>
+    </block>
+
+    <!-- 任务 -->
+    <block wx:if="{{activeModuleType === 'task'}}">
+      <view class="li-input-row">
+        <input class="modal-input" placeholder="输入任务..." value="{{taskInput}}" bindinput="onTaskInput" confirm-type="done" bindconfirm="addTask" />
+        <view class="li-add-btn" style="background:#64B5F6;" bindtap="addTask"><image src="{{plusIcon}}" mode="aspectFit" style="width:32rpx;height:32rpx;" /></view>
+      </view>
+      <view class="li-priority-selector">
+        <view class="li-priority-pill {{taskPriority === 'high' ? 'active' : ''}}" hover-class="pill-tap" hover-stay-time="80" data-p="high" bindtap="selectTaskPriority"><text user-select>高</text></view>
+        <view class="li-priority-pill {{taskPriority === 'medium' ? 'active' : ''}}" hover-class="pill-tap" hover-stay-time="80" data-p="medium" bindtap="selectTaskPriority"><text user-select>中</text></view>
+        <view class="li-priority-pill {{taskPriority === 'low' ? 'active' : ''}}" hover-class="pill-tap" hover-stay-time="80" data-p="low" bindtap="selectTaskPriority"><text user-select>低</text></view>
+        <picker mode="date" value="{{taskDeadline}}" bindchange="onTaskDeadline">
+          <view class="modal-input" style="flex:0 0 auto;width:240rpx;padding:10rpx 20rpx;font-size:calc(24rpx * var(--app-font-scale, 1));border-radius:40rpx;"><text user-select>{{taskDeadline || '选择截止日'}}</text></view>
+        </picker>
+      </view>
+      <view class="li-task-remind-tip"><text user-select>点任务右侧铃铛，开启到期当天微信提醒</text></view>
+      <scroll-view scroll-y class="li-module-body">
+        <view wx:if="{{!taskList.length}}" class="li-empty"><text user-select>还没有任务，添加一个开始管理</text></view>
+        <view class="li-task-item {{t.done ? 'done' : ''}}" wx:for="{{taskList}}" wx:key="index" wx:for-item="t">
+          <view class="li-task-bar" data-p="{{t.priority}}" style="background:{{t.barColor}}"></view>
+          <view class="li-task-info">
+            <text class="li-task-text" user-select>{{t.text}}</text>
+            <text class="li-task-deadline" wx:if="{{t.deadline}}" user-select>截止: {{t.deadline}}</text>
+          </view>
+          <view class="li-task-remind {{t.remind ? 'on' : ''}}" data-index="{{t.index}}" bindtap="toggleTaskRemind">
+            <image src="{{t.remind ? bellOnIcon : bellOffIcon}}" mode="aspectFit" style="width:32rpx;height:32rpx;" />
+          </view>
+          <view class="li-task-check {{t.done ? 'done' : ''}}" data-index="{{t.index}}" bindtap="toggleTask">
+            <image wx:if="{{t.done}}" src="{{checkIcon}}" mode="aspectFit" style="width:20rpx;height:20rpx;" />
+          </view>
+          <view class="li-del-btn" data-index="{{t.index}}" bindtap="deleteTask"><image src="{{delIcon}}" mode="aspectFit" style="width:20rpx;height:20rpx;" /></view>
+        </view>
+      </scroll-view>
+    </block>
+
+    <!-- 体重 / 数值记录 -->
+    <block wx:if="{{activeModuleType === 'weight' || activeModuleType === 'number'}}">
+      <scroll-view scroll-y class="li-module-body">
+        <view class="li-weight-display" wx:if="{{activeModuleType === 'weight' && weightLatest}}">
+          <text class="li-weight-current" user-select>{{weightLatest.weight}}</text>
+          <text class="li-weight-unit" user-select>kg</text>
+        </view>
+        <view class="li-weight-display" wx:if="{{activeModuleType === 'number' && numberLatest}}">
+          <text class="li-weight-current" user-select>{{numberLatest.value}}</text>
+          <text class="li-weight-unit" user-select>{{numberUnit}}</text>
+        </view>
+        <block wx:if="{{activeModuleType === 'weight'}}">
+          <view class="li-weight-input-row">
+            <input class="modal-input" type="digit" placeholder="输入体重(kg)" value="{{weightInput}}" bindinput="onWeightInput" confirm-type="done" bindconfirm="addWeight" />
+            <view class="li-add-btn" style="background:#CE93D8;" bindtap="addWeight"><image src="{{plusIcon}}" mode="aspectFit" style="width:32rpx;height:32rpx;" /></view>
+          </view>
+          <view wx:if="{{!weightList.length}}" class="li-empty"><text user-select>还没有记录，输入体重开始追踪</text></view>
+          <view class="li-weight-history-item" wx:for="{{weightList}}" wx:key="index" wx:for-item="r">
+            <text class="li-weight-history-date" user-select>{{r.date}}</text>
+            <text class="li-weight-history-value" user-select>{{r.weight}} kg</text>
+            <text class="li-weight-history-diff" style="color:{{r.diffStr && r.diffStr.indexOf('+')===0 ? '#F4B8B8' : '#B0D9B1'}}" wx:if="{{r.diffStr}}" user-select>{{r.diffStr}}</text>
+            <view class="li-del-btn" data-index="{{r.index}}" bindtap="deleteWeight"><image src="{{delIcon}}" mode="aspectFit" style="width:20rpx;height:20rpx;" /></view>
+          </view>
+        </block>
+        <block wx:if="{{activeModuleType === 'number'}}">
+          <view class="li-weight-input-row">
+            <input class="modal-input" type="digit" placeholder="输入数值({{numberUnit}})" value="{{numberInput}}" bindinput="onNumberInput" confirm-type="done" bindconfirm="addNumber" />
+            <view class="li-add-btn" style="background:#FFCC80;" bindtap="addNumber"><image src="{{plusIcon}}" mode="aspectFit" style="width:32rpx;height:32rpx;" /></view>
+          </view>
+          <view class="li-input-row" style="margin-top:12rpx;">
+            <input class="modal-input" placeholder="备注（可选）" value="{{numberNoteInput}}" bindinput="onNumberNoteInput" confirm-type="done" />
+          </view>
+          <view wx:if="{{!numberList.length}}" class="li-empty"><text user-select>还没有记录，输入数值开始追踪</text></view>
+          <view class="li-weight-history-item" wx:for="{{numberList}}" wx:key="index" wx:for-item="r">
+            <text class="li-weight-history-date" user-select>{{r.date}}</text>
+            <text class="li-weight-history-value" user-select>{{r.value}} {{numberUnit}} <text wx:if="{{r.note}}" class="li-number-note" user-select>· {{r.note}}</text></text>
+            <text class="li-weight-history-diff" style="color:{{r.diffStr && r.diffStr.indexOf('+')===0 ? '#F4B8B8' : '#B0D9B1'}}" wx:if="{{r.diffStr}}" user-select>{{r.diffStr}}</text>
+            <view class="li-del-btn" data-index="{{r.index}}" bindtap="deleteNumber"><image src="{{delIcon}}" mode="aspectFit" style="width:20rpx;height:20rpx;" /></view>
+          </view>
+        </block>
+      </scroll-view>
+    </block>
+
+    <!-- 自定义记录板块 -->
+    <block wx:if="{{activeModuleType === 'custom'}}">
+      <view class="li-input-row">
+        <input class="modal-input" placeholder="记录一条生活事项..." value="{{customInput}}" bindinput="onCustomInput" confirm-type="done" bindconfirm="addCustomRecord" />
+        <view class="li-add-btn" bindtap="addCustomRecord"><image src="{{plusIcon}}" mode="aspectFit" style="width:32rpx;height:32rpx;" /></view>
+      </view>
+      <scroll-view scroll-y class="li-module-body">
+        <view wx:if="{{!customList.length}}" class="li-empty"><text user-select>还没有记录，添加第一条吧</text></view>
+        <view class="li-todo-item {{t.done ? 'done' : ''}}" wx:for="{{customList}}" wx:key="index" wx:for-item="t">
+          <view class="li-todo-check {{t.done ? 'done' : ''}}" data-index="{{t.index}}" bindtap="toggleCustomRecord">
+            <image wx:if="{{t.done}}" src="{{checkIcon}}" mode="aspectFit" style="width:24rpx;height:24rpx;" />
+          </view>
+          <text class="li-todo-text" user-select>{{t.text}}</text>
+          <view class="li-del-btn" data-index="{{t.index}}" bindtap="deleteCustomRecord"><image src="{{delIcon}}" mode="aspectFit" style="width:20rpx;height:20rpx;" /></view>
+        </view>
+      </scroll-view>
+    </block>
+
+    <view class="modal-buttons">
+      <button class="modal-btn-cancel" bindtap="closeModule"><text user-select>关闭</text></button>
+    </view>
+  </view>
+</view>
+
+<!-- ===== 新建打卡任务弹窗（在打卡板块内弹出）===== -->
+<view class="modal-overlay theme-{{themeClass}}" wx:if="{{checkinCreateVisible}}" bindtap="closeCheckinCreate" style="--app-font-scale:{{appFontScale}};--app-font-weight:{{appFontWeight}}">
+  <view class="modal-sheet ci-create-sheet" catchtap="noop">
+    <view class="modal-handle"></view>
+    <view class="modal-title"><text user-select>新建打卡任务</text></view>
+
+    <view class="modal-input-group">
+      <text class="modal-label" user-select>任务名称</text>
+      <input class="modal-input" placeholder="如：每天喝水8杯" value="{{checkinTaskName}}" bindinput="onCheckinTaskName" confirm-type="done" bindconfirm="confirmCheckinCreate" />
+    </view>
+
+    <view class="modal-input-group">
+      <text class="modal-label" user-select>总打卡天数</text>
+      <view class="create-unit-row">
+        <view class="modal-cat-pill {{checkinCustomDays === '' && checkinTotalDays === item ? 'selected' : ''}}" hover-class="pill-tap" hover-stay-time="80" wx:for="{{checkinDayOptions}}" wx:key="*this" data-d="{{item}}" bindtap="selectCheckinTotalDays"><text user-select>{{item}}</text></view>
+      </view>
+      <view class="ci-custom-days">
+        <text class="modal-label" user-select>或自定义天数</text>
+        <input class="modal-input" type="number" placeholder="输入 1-365 之间的天数" value="{{checkinCustomDays}}" bindinput="onCheckinCustomDays" />
+      </view>
+      <view class="li-checkin-progress-text" style="margin-top:10rpx;"><text user-select>本次共 {{checkinEffectiveDays}} 天</text></view>
+    </view>
+
+    <view class="modal-buttons">
+      <button class="modal-btn-cancel" bindtap="closeCheckinCreate"><text user-select>取消</text></button>
+      <button class="modal-btn-confirm" bindtap="confirmCheckinCreate"><text user-select>创建</text></button>
+    </view>
+  </view>
+</view>
+
+<!-- ===== 板块管理弹窗（拖拽排序 / 隐藏 / 重命名 / 删除 / 新建）===== -->
+<view class="modal-overlay theme-{{themeClass}}" wx:if="{{manageVisible}}" bindtap="closeManage" style="--app-font-scale:{{appFontScale}};--app-font-weight:{{appFontWeight}}">
+  <view class="modal-sheet manage-sheet" catchtap="noop">
+    <view class="modal-handle"></view>
+    <view class="modal-title"><text user-select>管理板块</text></view>
+    <view class="manage-tip"><text user-select>拖动左侧手柄排序 · 点击标题可重命名 · 可隐藏板块</text></view>
+    <scroll-view scroll-y="{{draggingIndex < 0}}" class="manage-list">
+      <view
+        wx:for="{{manageList}}"
+        wx:key="id"
+        wx:for-item="m"
+        wx:for-index="mi"
+        class="manage-item {{draggingIndex === mi ? 'dragging' : ''}}"
+        style="{{draggingIndex === mi ? 'transform:translateY(' + dragOffset + 'px);' : ''}}"
+      >
+        <view
+          class="drag-handle"
+          data-index="{{mi}}"
+          bindtouchstart="onDragStart"
+          bindtouchmove="onDragMove"
+          bindtouchend="onDragEnd"
+        >
+          <view class="drag-dots"><text user-select></text><text user-select></text><text user-select></text><text user-select></text><text user-select></text><text user-select></text></view>
+        </view>
+        <image class="manage-icon" src="{{m.icon}}" mode="aspectFit" />
+        <block wx:if="{{editingId === m.id}}">
+          <input class="manage-rename-input" value="{{editTitle}}" bindinput="onRenameInput" focus="{{true}}" confirm-type="done" bindconfirm="confirmRename" />
+          <view class="manage-ok" bindtap="confirmRename"><text user-select>完成</text></view>
+        </block>
+        <block wx:else>
+          <text class="manage-label" bindtap="startRename" data-id="{{m.id}}" user-select>{{m.label}}</text>
+        </block>
+        <view class="manage-actions">
+          <view class="manage-hide-btn {{m.hidden ? 'is-hidden' : ''}}" data-id="{{m.id}}" bindtap="toggleModuleHidden"><text user-select>{{m.hidden ? '已隐藏' : '显示中'}}</text></view>
+          <view wx:if="{{!m.builtin}}" class="manage-del-btn" data-id="{{m.id}}" bindtap="deleteModule"><text user-select>删除</text></view>
+        </view>
+      </view>
+    </scroll-view>
+    <view class="manage-add-btn" bindtap="openCreate"><text user-select>＋ 新建板块</text></view>
+    <view class="modal-buttons">
+      <button class="modal-btn-confirm" bindtap="closeManage"><text user-select>完成</text></button>
+    </view>
+  </view>
+</view>
+
+<!-- ===== 新建板块弹窗 ===== -->
+<view class="modal-overlay theme-{{themeClass}}" wx:if="{{showCreateModal}}" bindtap="closeCreate" style="--app-font-scale:{{appFontScale}};--app-font-weight:{{appFontWeight}}">
+  <view class="modal-sheet create-sheet" catchtap="noop">
+    <view class="modal-handle"></view>
+    <view class="modal-title"><text user-select>{{createStep === 'type' ? '选择功能类型' : '配置板块'}}</text></view>
+
+    <!-- 第一步：选择功能类型 -->
+    <block wx:if="{{createStep === 'type'}}">
+      <view class="manage-tip"><text user-select>请选择已开发的功能，创建对应的独立板块。</text></view>
+      <view class="create-type-grid">
+        <view class="create-type-card" wx:for="{{createTypes}}" wx:key="type" wx:for-item="t" data-type="{{t.type}}" bindtap="selectCreateType">
+          <view class="create-type-icon" style="background:{{t.bg}}">
+            <image src="{{t.icon}}" mode="aspectFit" style="width:44rpx;height:44rpx;" />
+          </view>
+          <view class="create-type-info">
+            <text class="create-type-label" user-select>{{t.label}}</text>
+            <text class="create-type-desc" user-select>{{t.desc}}</text>
+          </view>
+        </view>
+      </view>
+    </block>
+
+    <!-- 第二步：配置名称/单位/天数 -->
+    <block wx:if="{{createStep === 'config'}}">
+      <view class="create-back" bindtap="backCreateType"><text user-select>← 重新选择类型</text></view>
+      <view class="modal-input-group">
+        <text class="modal-label" user-select>板块名称</text>
+        <input class="modal-input" placeholder="如：{{createType === 'number' ? '身高记录' : (createType === 'checkin' ? '每日喝水' : '读书记录')}}" value="{{newModuleName}}" bindinput="onNewModuleName" confirm-type="done" bindconfirm="confirmCreate" />
+      </view>
+
+      <!-- 数值记录：单位选择 -->
+      <view class="modal-input-group" wx:if="{{createType === 'number'}}">
+        <text class="modal-label" user-select>计量单位</text>
+        <view class="create-unit-row">
+          <view class="modal-cat-pill {{createUnit === item ? 'selected' : ''}}" hover-class="pill-tap" hover-stay-time="80" wx:for="{{units}}" wx:key="*this" data-u="{{item}}" bindtap="onCreateUnitPill"><text user-select>{{item}}</text></view>
+        </view>
+        <input class="modal-input" style="margin-top:12rpx;" placeholder="自定义单位" value="{{createUnit}}" bindinput="onCreateUnit" />
+      </view>
+
+      <view class="modal-buttons">
+        <button class="modal-btn-cancel" bindtap="closeCreate"><text user-select>取消</text></button>
+        <button class="modal-btn-confirm" bindtap="confirmCreate"><text user-select>创建</text></button>
+      </view>
+    </block>
+  </view>
+</view>
+
+<!-- ===== 个人信息编辑弹窗 ===== -->
+<view class="modal-overlay theme-{{themeClass}}" wx:if="{{showProfileModal}}" bindtap="closeProfileModal" style="--app-font-scale:{{appFontScale}};--app-font-weight:{{appFontWeight}}">
+  <view class="modal-sheet" catchtap="noop">
+    <view class="modal-handle"></view>
+    <view class="modal-title"><text user-select>编辑个人信息</text></view>
+
+    <view class="modal-input-group">
+      <text class="modal-label" user-select>昵称</text>
+      <input class="modal-input" placeholder="给自己起个昵称" value="{{profileNickname}}" bindinput="onProfileNickname" />
+    </view>
+
+    <view class="modal-input-group">
+      <text class="modal-label" user-select>性别</text>
+      <view class="modal-cat-row">
+        <view class="modal-cat-pill {{profileGender === '男' ? 'selected' : ''}}" hover-class="pill-tap" hover-stay-time="80" data-g="男" bindtap="selectGender"><text user-select>男</text></view>
+        <view class="modal-cat-pill {{profileGender === '女' ? 'selected' : ''}}" hover-class="pill-tap" hover-stay-time="80" data-g="女" bindtap="selectGender"><text user-select>女</text></view>
+        <view class="modal-cat-pill {{profileGender === '保密' ? 'selected' : ''}}" hover-class="pill-tap" hover-stay-time="80" data-g="保密" bindtap="selectGender"><text user-select>保密</text></view>
+        <view class="modal-cat-pill {{profileGender === '纸扎投石车' ? 'selected' : ''}}" hover-class="pill-tap" hover-stay-time="80" data-g="纸扎投石车" bindtap="selectGender"><text user-select>纸扎投石车</text></view>
+        <view class="modal-cat-pill {{profileGender === '沃尔玛购物袋' ? 'selected' : ''}}" hover-class="pill-tap" hover-stay-time="80" data-g="沃尔玛购物袋" bindtap="selectGender"><text user-select>沃尔玛购物袋</text></view>
+      </view>
+    </view>
+
+    <view class="modal-input-group">
+      <text class="modal-label" user-select>年龄</text>
+      <input class="modal-input" type="digit" placeholder="如：25" value="{{profileAge}}" bindinput="onProfileAge" />
+    </view>
+
+    <view class="modal-buttons">
+      <button class="modal-btn-cancel" bindtap="closeProfileModal"><text user-select>取消</text></button>
+      <button class="modal-btn-confirm" bindtap="saveProfile"><text user-select>保存</text></button>
+    </view>
+  </view>
+</view>
+
+<drawer id="drawer" show="{{drawerShow}}" pages="{{drawerPages}}" bind:close="onDrawerClose" bind:navigate="onDrawerNavigate" />

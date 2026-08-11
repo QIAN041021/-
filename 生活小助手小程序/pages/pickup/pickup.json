@@ -1,0 +1,4 @@
+{
+  "navigationBarTitleText": "取件码",
+  "usingComponents": { "drawer": "/components/drawer/index" }
+}

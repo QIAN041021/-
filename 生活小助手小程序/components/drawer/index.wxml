@@ -1,0 +1,19 @@
+<view class="drawer-mask" wx:if="{{show}}" bindtap="onMaskTap">
+  <view class="drawer-panel" catchtap="noop">
+    <view class="drawer-title"><text user-select>全部页面</text></view>
+    <scroll-view class="drawer-list" scroll-y>
+      <view
+        wx:for="{{pages}}"
+        wx:key="key"
+        class="drawer-item {{item.active ? 'active' : ''}}"
+        hover-class="drawer-item-tap"
+        hover-stay-time="80"
+        data-index="{{index}}"
+        bindtap="onItemTap"
+      >
+        <text class="drawer-item-text" user-select>{{item.text}}</text>
+      </view>
+    </scroll-view>
+    <view class="drawer-tip"><text user-select>底部导航栏可在设置里自定义</text></view>
+  </view>
+</view>
